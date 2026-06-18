@@ -1,241 +1,110 @@
-*{
-
-box-sizing:border-box;
-
+* {
+  box-sizing: border-box;
 }
 
-
-body{
-
-
-margin:0;
-
-background:#0b0f14;
-
-color:white;
-
-font-family:Arial;
-
-
+body {
+  margin: 0;
+  background: #0b0f14;
+  color: white;
+  font-family: Arial, sans-serif;
 }
 
-
-
-.dashboard{
-
-
-max-width:1400px;
-
-margin:auto;
-
-padding:30px;
-
-
+.dashboard {
+  max-width: 1400px;
+  margin: auto;
+  padding: 30px;
 }
 
-
-
-h1{
-
-
-text-align:center;
-
-color:#f48120;
-
-font-size:38px;
-
-
+h1 {
+  text-align: center;
+  color: #f48120;
+  font-size: 36px;
 }
 
-
-
-.subtitle{
-
-
-text-align:center;
-
-color:#aaa;
-
-margin-bottom:30px;
-
-
+.subtitle {
+  text-align: center;
+  color: #9aa4b2;
+  margin-bottom: 25px;
 }
 
-
-
-
-.grid{
-
-
-display:grid;
-
-grid-template-columns:
-repeat(12,1fr);
-
-gap:20px;
-
-
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 18px;
 }
 
-
-
-
-.card{
-
-
-background:#151a21;
-
-border:1px solid #2c333b;
-
-border-radius:14px;
-
-padding:20px;
-
-
-box-shadow:
-
-0 0 20px rgba(244,129,32,.15);
-
-
+.card {
+  background: #151a21;
+  border: 1px solid #2b313a;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 0 20px rgba(244,129,32,0.1);
 }
 
-
-
-.full{
-
-
-grid-column:span 12;
-
-
+.full {
+  grid-column: span 12;
 }
 
-
-.card:not(.full){
-
-
-grid-column:span 4;
-
-
+.card:not(.full) {
+  grid-column: span 4;
 }
 
-
-
-
-
-button{
-
-
-background:#f48120;
-
-color:white;
-
-border:none;
-
-padding:10px 15px;
-
-margin:5px;
-
-border-radius:8px;
-
-cursor:pointer;
-
-
+h2 {
+  font-size: 16px;
+  margin-top: 0;
+  color: #f5f5f5;
+  border-bottom: 1px solid #2b313a;
+  padding-bottom: 8px;
 }
 
-
-
-button:hover{
-
-
-background:#ff9b45;
-
-
+button {
+  background: #f48120;
+  color: white;
+  border: none;
+  padding: 10px 12px;
+  margin: 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
 }
 
-
-
-
-.status{
-
-
-display:flex;
-
-flex-wrap:wrap;
-
-
+button:hover {
+  background: #ff9a3d;
 }
 
-
-
-
-#counter{
-
-
-font-size:55px;
-
-text-align:center;
-
-color:#f48120;
-
-font-weight:bold;
-
-
+#counter {
+  font-size: 50px;
+  text-align: center;
+  color: #f48120;
+  font-weight: bold;
 }
 
-
-
-
-#trafficChart{
-
-
-height:350px!important;
-
-
+#log {
+  height: 300px;
+  overflow: auto;
+  background: #0a0e12;
+  padding: 12px;
+  border-radius: 10px;
+  font-family: monospace;
+  font-size: 12px;
+  color: #00ff99;
 }
 
-
-
-
-#log{
-
-
-height:300px;
-
-overflow:auto;
-
-background:#050607;
-
-padding:15px;
-
-border-radius:10px;
-
-font-family:monospace;
-
-color:#00ff99;
-
-
+pre {
+  background: #0a0e12;
+  padding: 10px;
+  border-radius: 10px;
+  color: #00ff99;
+  font-size: 12px;
+  overflow: auto;
 }
 
-
-
-
-@media(max-width:900px){
-
-
-.card,
-.card:not(.full){
-
-grid-column:span 12;
-
-
+canvas {
+  height: 320px !important;
 }
 
-
-button{
-
-width:100%;
-
-}
-
-
+@media(max-width: 900px) {
+  .card:not(.full) {
+    grid-column: span 12;
+  }
 }
