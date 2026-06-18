@@ -24,7 +24,7 @@
 <h1>☁️ Cloudflare Security Lab</h1>
 
 <p class="subtitle">
-Traffic simulation + edge analytics learning dashboard
+Traffic Simulation + Edge Analytics Training
 </p>
 
 
@@ -32,10 +32,11 @@ Traffic simulation + edge analytics learning dashboard
 <div class="grid">
 
 
+<!-- CHART -->
 
 <div class="card full">
 
-<h2>📊 Live Edge Traffic Analytics</h2>
+<h2>📊 Live Traffic Analytics</h2>
 
 <canvas id="trafficChart"></canvas>
 
@@ -44,12 +45,16 @@ Traffic simulation + edge analytics learning dashboard
 
 
 
+<!-- TRAFFIC -->
+
 <div class="card">
+
 
 <h2>Traffic Generator</h2>
 
+
 <button onclick="normalTraffic()">
-Normal Request
+Normal Traffic
 </button>
 
 
@@ -68,18 +73,18 @@ Bot Traffic
 
 
 
+
+
+<!-- PROFILE -->
+
 <div class="card">
+
 
 <h2>Traffic Profiles</h2>
 
 
 <button onclick="sendRequest('Chrome Windows')">
 Chrome Windows
-</button>
-
-
-<button onclick="sendRequest('Chrome Mac')">
-Chrome Mac
 </button>
 
 
@@ -104,29 +109,27 @@ Bot
 
 
 
+
+<!-- SECURITY -->
+
 <div class="card">
 
 
 <h2>Security Testing</h2>
 
 
-<button onclick="wafTest()">
+<button onclick="sendStatus(403)">
 WAF Block
 </button>
 
 
-<button onclick="rateLimit()">
-429 Rate Limit
+<button onclick="sendStatus(429)">
+Rate Limit
 </button>
 
 
-<button onclick="errorTest()">
-404 Error
-</button>
-
-
-<button onclick="cacheTest()">
-Cache Test
+<button onclick="sendStatus(404)">
+404 Test
 </button>
 
 
@@ -136,6 +139,8 @@ Cache Test
 
 
 
+
+<!-- STATUS -->
 
 <div class="card">
 
@@ -146,35 +151,50 @@ Cache Test
 <div class="status">
 
 
-<button onclick="sendStatus(200)">200</button>
-
-<button onclick="sendStatus(201)">201</button>
-
-<button onclick="sendStatus(202)">202</button>
+<button onclick="sendStatus(200)">
+200
+</button>
 
 
-<button onclick="sendStatus(301)">301</button>
-
-<button onclick="sendStatus(302)">302</button>
-
-
-<button onclick="sendStatus(403)">403</button>
-
-<button onclick="sendStatus(404)">404</button>
-
-<button onclick="sendStatus(410)">410</button>
+<button onclick="sendStatus(301)">
+301
+</button>
 
 
-<button onclick="sendStatus(429)">429</button>
+<button onclick="sendStatus(302)">
+302
+</button>
 
-<button onclick="sendStatus(499)">499</button>
+
+<button onclick="sendStatus(403)">
+403
+</button>
 
 
-<button onclick="sendStatus(500)">500</button>
+<button onclick="sendStatus(404)">
+404
+</button>
 
-<button onclick="sendStatus(502)">502</button>
 
-<button onclick="sendStatus(503)">503</button>
+<button onclick="sendStatus(429)">
+429
+</button>
+
+
+<button onclick="sendStatus(500)">
+500
+</button>
+
+
+<button onclick="sendStatus(502)">
+502
+</button>
+
+
+<button onclick="sendStatus(503)">
+503
+</button>
+
 
 
 </div>
@@ -185,41 +205,49 @@ Cache Test
 
 
 
+
+
+<!-- COUNTER -->
 
 
 <div class="card">
 
 
-<h2>Live Requests</h2>
+<h2>Total Requests</h2>
+
 
 <div id="counter">
+
 0
-</div>
-
 
 </div>
 
 
+</div>
 
 
 
+
+
+
+
+<!-- LOG -->
 
 
 <div class="card full">
 
 
-<h2>Request Logs</h2>
+<h2>Activity Logs</h2>
+
 
 <div id="log">
 
-Waiting for traffic...
+Waiting...
 
 </div>
 
 
 </div>
-
-
 
 
 
