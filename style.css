@@ -1,74 +1,31 @@
-body{
-
-
-background:#0f172a;
-
-font-family:Arial;
-
-color:white;
-
+body {
+  font-family: Arial;
+  background: #0b1220;
+  color: white;
 }
 
-
-
-.dashboard{
-
-
-width:80%;
-
-margin:auto;
-
-margin-top:50px;
-
-
+.dashboard {
+  width: 85%;
+  margin: auto;
+  margin-top: 40px;
 }
 
-
-
-.card{
-
-
-background:#1e293b;
-
-padding:20px;
-
-margin:20px;
-
-border-radius:10px;
-
-
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
 }
 
-
-
-button{
-
-
-padding:12px;
-
-margin:8px;
-
-cursor:pointer;
-
-background:#38bdf8;
-
-border:none;
-
-border-radius:5px;
-
-
+.card {
+  background: #111b2e;
+  padding: 20px;
+  border-radius: 12px;
 }
 
-
-
-#log{
-
-
-background:black;
-
-padding:15px;
-
-min-height:50px;
-
-
+button {
+  display: block;
+  width: 100%;
+  margin: 8px 0;
+  padding: 10px;
+  cursor: pointer;
 }
