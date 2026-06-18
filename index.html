@@ -1,155 +1,66 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-
-<title>Cloudflare Security Lab</title>
-
-<link rel="stylesheet" href="style.css">
-
+  <title>Cloudflare Traffic Intelligence Lab</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 
 <body>
 
-
 <div class="dashboard">
 
+<h1>☁️ Cloudflare Traffic Intelligence Lab</h1>
 
-<h1>☁️ Cloudflare Security Lab</h1>
+<p>Simulate and generate traffic patterns for Cloudflare analytics</p>
 
-<p>
-Traffic simulator for Cloudflare Analytics testing
-</p>
+<div class="grid">
 
-
-
+<!-- Traffic Profiles -->
 <div class="card">
+<h2>Traffic Profiles</h2>
 
-<h2>Traffic Generator</h2>
-
-
-<button onclick="normalTraffic()">
-Normal Request
-</button>
-
-
-<button onclick="trafficSpike()">
-Traffic Spike
-</button>
-
-
-<button onclick="botSimulation()">
-Bot Traffic
-</button>
-
-
-
+<button onclick="sendRequest('chrome_win')">Chrome - Windows</button>
+<button onclick="sendRequest('chrome_mac')">Chrome - macOS</button>
+<button onclick="sendRequest('safari_ios')">Safari - iOS</button>
+<button onclick="sendRequest('android')">Android Browser</button>
+<button onclick="sendRequest('bot')">Bot UA</button>
 </div>
 
-
-
+<!-- Edge Simulation -->
 <div class="card">
+<h2>Edge Behavior Tests</h2>
 
-
-<h2>Security Testing</h2>
-
-
-<button onclick="wafTest()">
-WAF Rule Test
-</button>
-
-
-<button onclick="rateLimit()">
-Rate Limit Test
-</button>
-
-
-
-<button onclick="loginAttack()">
-Fake Login Test
-</button>
-
-
+<button onclick="normal()">Normal Request</button>
+<button onclick="spike()">Traffic Spike</button>
+<button onclick="errorTest()">Force 404 Test</button>
+<button onclick="cacheTest()">Cache Test</button>
 </div>
 
-
-
+<!-- HTTP Simulation -->
 <div class="card">
+<h2>HTTP Simulation</h2>
 
-
-<h2>Live Request Counter</h2>
-
-
-<h1 id="counter">
-
-0
-
-</h1>
-
+<button onclick="httpTest()">Simulate HTTP Variation</button>
+<button onclick="apiTest()">API Traffic</button>
 
 </div>
 
-
-
-
+<!-- Stats -->
 <div class="card">
+<h2>Live Stats</h2>
 
+<p>Requests Sent:</p>
+<h1 id="counter">0</h1>
 
-<h2>JA3 / JA4 Fingerprinting</h2>
-
-
-<p>
-
-JA3 identifies TLS client fingerprints.
-
-Example:
-
-Chrome browser:
-TLS version +
-cipher suites +
-extensions
-
-
-</p>
-
-
-<p>
-
-JA4 improves this by adding more detailed
-network fingerprint information.
-
-</p>
-
+<p>Last Event:</p>
+<div id="log">Waiting...</div>
+</div>
 
 </div>
 
-
-
-<div class="card">
-
-
-<h2>Activity Log</h2>
-
-
-<div id="log">
-
-Waiting...
-
 </div>
-
-
-</div>
-
-
-
-</div>
-
 
 <script src="script.js"></script>
 
-
 </body>
-
-
 </html>
