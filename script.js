@@ -93,3 +93,18 @@ function cacheTest() {
   inc();
   log("Cache test sent");
 }
+
+/* -------------------------
+   EDGE STATUS SIMULATOR
+------------------------- */
+function sendStatus(code) {
+  fetch("/status/" + code)
+    .then(() => {
+      inc();
+      log("Edge Status simulated: " + code);
+    })
+    .catch(() => {
+      inc();
+      log("Edge Status simulated (offline mode): " + code);
+    });
+}
