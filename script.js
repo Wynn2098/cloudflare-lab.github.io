@@ -1,216 +1,124 @@
-
 let count = 0;
 
-
-
-function addLog(message){
-
-
-document.getElementById("log").innerHTML =
-message;
-
-
-
+function log(msg) {
+  document.getElementById("log").innerText = msg;
 }
 
-
-
-function increase(){
-
-
-count++;
-
-
-document.getElementById("counter").innerHTML=count;
-
-
+function inc() {
+  count++;
+  document.getElementById("counter").innerText = count;
 }
 
+/* -----------------------------
+   USER AGENT PROFILES
+----------------------------- */
 
+const agents = {
+  chrome_win:
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
 
-// Normal traffic
+  chrome_mac:
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_5) AppleWebKit/537.36 Chrome/120 Safari/537.36",
 
-function normalTraffic(){
+  safari_ios:
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) Version/17.0 Safari/605.1.15",
 
+  android:
+    "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome/120 Mobile Safari/537.36",
 
-fetch("/")
+  bot:
+    "Cloudflare-Lab-Bot/1.0"
+};
 
+/* -----------------------------
+   CORE REQUEST FUNCTION
+----------------------------- */
 
-increase();
+function sendRequest(profile) {
+  fetch("/", {
+    method: "GET",
+    headers: {
+      "User-Agent": agents[profile] || agents.chrome_win,
+      "X-Lab-Profile": profile,
+      "X-Client-Type": "cloudflare-lab-simulator"
+    }
+  });
 
-
-addLog(
-
-"Normal user request generated"
-
-);
-
-
+  inc();
+  log("Sent request profile: " + profile);
 }
 
+/* -----------------------------
+   NORMAL TRAFFIC
+----------------------------- */
 
-
-
-// Traffic spike
-
-function trafficSpike(){
-
-
-addLog(
-
-"Sending traffic spike..."
-
-);
-
-
-
-for(let i=0;i<200;i++){
-
-
-fetch("/traffic-test");
-
-
-increase();
-
-
+function normal() {
+  fetch("/");
+  inc();
+  log("Normal request sent");
 }
 
+/* -----------------------------
+   TRAFFIC SPIKE
+----------------------------- */
 
+function spike() {
+  for (let i = 0; i < 150; i++) {
+    fetch("/spike-test");
+    inc();
+  }
+  log("Traffic spike sent (150 requests)");
 }
 
+/* -----------------------------
+   ERROR TEST (Edge 404)
+----------------------------- */
 
-
-// Bot simulation
-
-function botSimulation(){
-
-
-fetch("/bot-test",{
-
-
-headers:{
-
-
-"User-Agent":"Cloudflare-Lab-Bot"
-
-
+function errorTest() {
+  fetch("/this-page-does-not-exist-" + Math.random());
+  inc();
+  log("404 test triggered");
 }
 
+/* -----------------------------
+   CACHE TEST
+----------------------------- */
 
-});
-
-
-
-increase();
-
-
-addLog(
-
-"Bot-like User-Agent sent"
-
-);
-
-
-
+function cacheTest() {
+  fetch("/image.jpg?cache=" + Date.now());
+  inc();
+  log("Cache-bypass request sent");
 }
 
+/* -----------------------------
+   HTTP VARIATION SIMULATION
+----------------------------- */
 
+function httpTest() {
+  fetch("/api/test", {
+    headers: {
+      "X-Test-HTTP": "HTTP-1.1-simulated",
+      "X-Edge-Case": "true"
+    }
+  });
 
-
-// WAF Test
-
-
-function wafTest(){
-
-
-fetch("/admin-panel");
-
-
-increase();
-
-
-addLog(
-
-"WAF test request: /admin-panel"
-
-);
-
-
+  inc();
+  log("HTTP variation request sent");
 }
 
+/* -----------------------------
+   API TEST
+----------------------------- */
 
+function apiTest() {
+  fetch("/api/data", {
+    method: "POST",
+    body: JSON.stringify({ test: "data" }),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
 
-
-// Rate Limit Test
-
-
-function rateLimit(){
-
-
-
-addLog(
-
-"Testing rate limit..."
-
-);
-
-
-
-for(let i=0;i<500;i++){
-
-
-fetch("/rate-test");
-
-
-increase();
-
-
-}
-
-
-}
-
-
-
-
-// Fake login attack
-
-
-function loginAttack(){
-
-
-
-fetch("/login",{
-
-
-method:"POST",
-
-
-body:JSON.stringify({
-
-
-username:"admin",
-
-
-password:"test"
-
-
-})
-
-
-});
-
-
-
-increase();
-
-
-
-addLog(
-
-"Fake login request generated"
-
-);
-
-
+  inc();
+  log("API request sent");
 }
