@@ -1,9 +1,9 @@
 const WORKER_URL = "https://cloudflarelab-api.wincapz20.workers.dev/";
 
-let count = 0;
+let requestCount = 0;
 
-let labels = [];
-let data = [];
+let labelsArr = [];
+let chartDataArr = [];
 
 let statusMap = {};
 let countryMap = {};
@@ -13,10 +13,10 @@ const ctx = document.getElementById("chart").getContext("2d");
 const chart = new Chart(ctx, {
 type: "line",
 data: {
-labels,
+labels: labelsArr,
 datasets: [{
 label: "Requests",
-data,
+data: chartDataArr,
 borderWidth: 2
 }]
 },
@@ -26,18 +26,14 @@ responsive: true
 }
 });
 
-function random(arr){
-return arr[Math.floor(Math.random() * arr.length)];
-}
+async function callWorker(statusCode, attackType = "normal") {
 
-async function callWorker(status){
-
-const res = await fetch(`${WORKER_URL}/?status=${status}`);
+const res = await fetch(`${WORKER_URL}/?status=${statusCode}&type=${attackType}`);
 const json = await res.json();
 
-count++;
+requestCount++;
 
-document.getElementById("counter").innerText = count;
+document.getElementById("counter").innerText = requestCount;
 
 // STATUS MAP
 statusMap[json.status] = (statusMap[json.status] || 0) + 1;
@@ -48,37 +44,50 @@ countryMap[json.country] = (countryMap[json.country] || 0) + 1;
 updateUI(json);
 }
 
-function updateUI(data){
+function updateUI(res) {
 
-labels.push(new Date().toLocaleTimeString());
-data.push(count);
+labelsArr.push(new Date().toLocaleTimeString());
+chartDataArr.push(requestCount);
 
-if(labels.length > 20){
-labels.shift();
-data.shift();
+if (labelsArr.length > 20) {
+labelsArr.shift();
+chartDataArr.shift();
 }
 
 chart.update();
 
+// LOGS
 document.getElementById("log").innerHTML =
 `[${new Date().toLocaleTimeString()}]
-STATUS: ${data.status}
-COUNTRY: ${data.country}
-BOT: ${data.botScore}
-CACHE: ${data.cache}
+STATUS: ${res.status}
+COUNTRY: ${res.country}
+BOT SCORE: ${res.botScore}
+CACHE: ${res.cache}
+WAF: ${res.waf}
+DDoS FLAG: ${res.ddos}
 -------------------<br>` + document.getElementById("log").innerHTML;
 
+// STATUS BREAKDOWN
 document.getElementById("statusBox").innerText =
 JSON.stringify(statusMap, null, 2);
 
+// COUNTRY BREAKDOWN
 document.getElementById("countryBox").innerText =
 JSON.stringify(countryMap, null, 2);
 }
 
-/* BUTTONS */
+/* TRAFFIC BUTTONS */
+function sendTraffic(){ callWorker(200, "normal"); }
 
-function sendTraffic(){ callWorker(200); }
-function spamTraffic(){ for(let i=0;i<10;i++) callWorker(200); }
-function botTraffic(){ for(let i=0;i<10;i++) callWorker(403); }
+function spamTraffic(){
+for(let i=0;i<10;i++) callWorker(200, "burst");
+}
 
-function sendStatus(code){ callWorker(code); }
+function botTraffic(){
+for(let i=0;i<10;i++) callWorker(403, "bot");
+}
+
+/* EDGE STATUS SIMULATION */
+function sendStatus(code){
+callWorker(code, "manual");
+}
