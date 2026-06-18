@@ -1,8 +1,14 @@
 let counter = 0;
 
-// =========================
-// LIVE CHART SETUP
-// =========================
+// ======================
+// DATA BUFFERS (IMPORTANT)
+// ======================
+let eventBuffer = 0;
+let logBuffer = [];
+
+// ======================
+// CHART SETUP
+// ======================
 const ctx = document.getElementById("trafficChart");
 
 const labels = [];
@@ -11,170 +17,126 @@ const dataPoints = [];
 const trafficChart = new Chart(ctx, {
 type: "line",
 data: {
-labels: labels,
+labels,
 datasets: [{
 label: "Requests / sec",
 data: dataPoints,
 borderColor: "#f38020",
-backgroundColor: "rgba(243,128,32,0.2)",
 tension: 0.4
 }]
 },
 options: {
-responsive: true,
 animation: false,
-scales: {
-y: { beginAtZero: true }
-}
+responsive: true,
+scales: { y: { beginAtZero: true } }
 }
 });
 
-// =========================
-// LOG SYSTEM (optimized)
-// =========================
+// ======================
+// FAST LOG (NO INNERHTML)
+// ======================
 function log(msg) {
-const logBox = document.getElementById("log");
-
-const div = document.createElement("div");
-div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
-
-logBox.prepend(div);
-
-// limit logs (performance fix)
-while (logBox.children.length > 60) {
-logBox.removeChild(logBox.lastChild);
-}
+logBuffer.push(`[${new Date().toLocaleTimeString()}] ${msg}`);
+if (logBuffer.length > 30) logBuffer.shift();
 }
 
-// =========================
-// COUNTER + CHART UPDATE
-// =========================
-function updateMetrics(value = 1) {
+// render logs slowly (NOT instantly)
+setInterval(() => {
+const box = document.getElementById("log");
+box.innerHTML = logBuffer.map(l => `<div>${l}</div>`).join("");
+}, 1000);
+
+// ======================
+// CORE ENGINE (BATCHED UPDATE)
+// ======================
+function emitTraffic(value = 1, message = "request") {
 counter += value;
-document.getElementById("counter").innerText = counter;
+eventBuffer += value;
+log(message);
 
-// chart update
+document.getElementById("counter").innerText = counter;
+}
+
+// ======================
+// CHART UPDATE LOOP (IMPORTANT FIX)
+// ======================
+setInterval(() => {
+const value = eventBuffer;
+
 const time = new Date().toLocaleTimeString();
 
 labels.push(time);
 dataPoints.push(value);
 
-// keep last 20 points only
-if (labels.length > 20) {
+// keep only last 15 points
+if (labels.length > 15) {
 labels.shift();
 dataPoints.shift();
 }
 
 trafficChart.update();
-}
 
-// =========================
-// SIMULATED "WEBSOCKET STREAM"
-// =========================
+eventBuffer = 0;
+}, 1000);
+
+// ======================
+// SIMULATED BACKGROUND TRAFFIC
+// ======================
 setInterval(() => {
-const randomTraffic = Math.floor(Math.random() * 5);
+emitTraffic(Math.floor(Math.random() * 3), "Live traffic stream");
+}, 1200);
 
-// simulate normal background traffic
-updateMetrics(randomTraffic);
-log(`Live traffic +${randomTraffic}`);
-}, 1500);
-
-// =========================
-// TRAFFIC FUNCTIONS
-// =========================
+// ======================
+// BUTTON FUNCTIONS
+// ======================
 function normalTraffic() {
-updateMetrics(1);
-log("Normal request");
+emitTraffic(1, "Normal request");
 }
 
 function trafficSpike() {
-let i = 0;
-
-const interval = setInterval(() => {
-updateMetrics(3);
-log("Traffic spike burst");
-
-i++;
-if (i > 10) clearInterval(interval);
-}, 200);
+for (let i = 0; i < 5; i++) {
+setTimeout(() => {
+emitTraffic(3, "Spike request");
+}, i * 150);
+}
 }
 
 function botSimulation() {
-let i = 0;
-
-const interval = setInterval(() => {
-updateMetrics(2);
-log("Bot request detected");
-
-i++;
-if (i > 8) clearInterval(interval);
-}, 250);
+for (let i = 0; i < 5; i++) {
+setTimeout(() => {
+emitTraffic(2, "Bot request");
+}, i * 200);
+}
 }
 
-// =========================
-// PROFILE SIMULATION
-// =========================
 function sendRequest(type) {
-updateMetrics(1);
-log(`Request: ${type}`);
+emitTraffic(1, `Profile: ${type}`);
 }
 
-// =========================
-// SECURITY SIMULATION
-// =========================
 function wafTest() {
-updateMetrics(1);
-log("WAF blocked suspicious request");
+emitTraffic(1, "WAF blocked request");
 }
 
 function rateLimit() {
-updateMetrics(2);
-log("Rate limit triggered (429)");
+emitTraffic(2, "Rate limit hit (429)");
 }
 
 function loginAttack() {
-let i = 0;
-
-const interval = setInterval(() => {
-updateMetrics(1);
-log("Fake login attempt");
-
-i++;
-if (i > 6) clearInterval(interval);
-}, 200);
+for (let i = 0; i < 4; i++) {
+setTimeout(() => {
+emitTraffic(1, "Login attempt blocked");
+}, i * 250);
+}
 }
 
 function errorTest() {
-updateMetrics(1);
-log("404 generated");
+emitTraffic(1, "404 error");
 }
 
 function cacheTest() {
-updateMetrics(1);
-log("Cache HIT");
+emitTraffic(1, "Cache HIT");
 }
 
-// =========================
-// EDGE STATUS SIMULATION
-// =========================
 function sendStatus(code) {
-updateMetrics(1);
-
-const messages = {
-200: "OK",
-201: "Created",
-202: "Accepted",
-301: "Redirect",
-302: "Found",
-403: "Forbidden",
-404: "Not Found",
-410: "Gone",
-429: "Rate Limited",
-499: "Client Closed",
-500: "Server Error",
-502: "Bad Gateway",
-503: "Service Unavailable"
-};
-
-log(`Edge ${code} - ${messages[code] || "Unknown"}`);
+emitTraffic(1, `Edge status ${code}`);
 }
