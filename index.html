@@ -1,85 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Cloudflare Security Lab</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edge Analytics Lab</title>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
 <div class="dashboard">
 
-<h1>☁️ Cloudflare Security Lab</h1>
-<p class="subtitle">Full Edge Simulation Dashboard</p>
+<h1>☁️ Edge Analytics Lab</h1>
+<p class="subtitle">Real-time traffic + bot detection simulation</p>
 
 <div class="grid">
 
-<!-- CHART -->
+<div class="card">
+<h2>Controls</h2>
+<button onclick="sendEvent('normal')">Normal Traffic</button>
+<button onclick="sendEvent('bot')">Bot Traffic</button>
+<button onclick="sendEvent('spike')">Traffic Spike</button>
+</div>
+
+<div class="card">
+<h2>Live Counter</h2>
+<div id="counter">0</div>
+</div>
+
+<div class="card">
+<h2>Bot Rate</h2>
+<div id="botRate">0%</div>
+</div>
+
 <div class="card full">
-<h2>Live Traffic</h2>
+<h2>Live Traffic Graph</h2>
 <canvas id="chart"></canvas>
 </div>
 
-<!-- CONTROLS -->
-<div class="card">
-<h2>Traffic</h2>
-<button onclick="sendTraffic()">Normal</button>
-<button onclick="spamTraffic()">Spike</button>
-<button onclick="botTraffic()">Bot</button>
-</div>
-
-<div class="card">
-<h2>Status Codes</h2>
-<div class="card">
-<h2>Status Codes</h2>
-
-<button onclick="sendStatus(200)">200</button>
-<button onclick="sendStatus(201)">201</button>
-<button onclick="sendStatus(202)">202</button>
-<button onclick="sendStatus(301)">301</button>
-<button onclick="sendStatus(302)">302</button>
-<button onclick="sendStatus(403)">403</button>
-<button onclick="sendStatus(404)">404</button>
-<button onclick="sendStatus(410)">410</button>
-<button onclick="sendStatus(429)">429</button>
-<button onclick="sendStatus(499)">499</button>
-<button onclick="sendStatus(500)">500</button>
-<button onclick="sendStatus(502)">502</button>
-<button onclick="sendStatus(503)">503</button>
-
-</div>
-</div>
-
-<!-- COUNTER -->
-<div class="card">
-<h2>Total Requests</h2>
-<div id="counter"></div>
-</div>
-
-<!-- STATUS BREAKDOWN -->
-<div class="card">
-<h2>Status Breakdown</h2>
-<pre id="statusBox">Waiting...</pre>
-</div>
-
-<!-- COUNTRY -->
-<div class="card">
-<h2>Country Stats</h2>
-<pre id="countryBox">Waiting...</pre>
-</div>
-
-<!-- LOGS -->
 <div class="card full">
-<h2>Activity Logs</h2>
+<h2>Event Stream</h2>
 <div id="log"></div>
 </div>
 
 </div>
-
 </div>
 
 <script src="script.js"></script>
