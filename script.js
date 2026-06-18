@@ -1,97 +1,180 @@
 let counter = 0;
 
-function updateCounter() {
-counter++;
-document.getElementById("counter").innerText = counter;
-}
+// =========================
+// LIVE CHART SETUP
+// =========================
+const ctx = document.getElementById("trafficChart");
 
+const labels = [];
+const dataPoints = [];
+
+const trafficChart = new Chart(ctx, {
+type: "line",
+data: {
+labels: labels,
+datasets: [{
+label: "Requests / sec",
+data: dataPoints,
+borderColor: "#f38020",
+backgroundColor: "rgba(243,128,32,0.2)",
+tension: 0.4
+}]
+},
+options: {
+responsive: true,
+animation: false,
+scales: {
+y: { beginAtZero: true }
+}
+}
+});
+
+// =========================
+// LOG SYSTEM (optimized)
+// =========================
 function log(msg) {
 const logBox = document.getElementById("log");
-logBox.innerHTML = `[${new Date().toLocaleTimeString()}] ${msg}<br>` + logBox.innerHTML;
+
+const div = document.createElement("div");
+div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+
+logBox.prepend(div);
+
+// limit logs (performance fix)
+while (logBox.children.length > 60) {
+logBox.removeChild(logBox.lastChild);
+}
 }
 
-// Basic traffic
+// =========================
+// COUNTER + CHART UPDATE
+// =========================
+function updateMetrics(value = 1) {
+counter += value;
+document.getElementById("counter").innerText = counter;
+
+// chart update
+const time = new Date().toLocaleTimeString();
+
+labels.push(time);
+dataPoints.push(value);
+
+// keep last 20 points only
+if (labels.length > 20) {
+labels.shift();
+dataPoints.shift();
+}
+
+trafficChart.update();
+}
+
+// =========================
+// SIMULATED "WEBSOCKET STREAM"
+// =========================
+setInterval(() => {
+const randomTraffic = Math.floor(Math.random() * 5);
+
+// simulate normal background traffic
+updateMetrics(randomTraffic);
+log(`Live traffic +${randomTraffic}`);
+}, 1500);
+
+// =========================
+// TRAFFIC FUNCTIONS
+// =========================
 function normalTraffic() {
-updateCounter();
-log("Normal user request received");
+updateMetrics(1);
+log("Normal request");
 }
 
 function trafficSpike() {
-for (let i = 0; i < 20; i++) {
-setTimeout(() => {
-updateCounter();
-log("Traffic spike request");
-}, i * 100);
-}
+let i = 0;
+
+const interval = setInterval(() => {
+updateMetrics(3);
+log("Traffic spike burst");
+
+i++;
+if (i > 10) clearInterval(interval);
+}, 200);
 }
 
 function botSimulation() {
-for (let i = 0; i < 10; i++) {
-setTimeout(() => {
-updateCounter();
-log("Bot traffic detected");
-}, i * 150);
-}
+let i = 0;
+
+const interval = setInterval(() => {
+updateMetrics(2);
+log("Bot request detected");
+
+i++;
+if (i > 8) clearInterval(interval);
+}, 250);
 }
 
-// Profile traffic
+// =========================
+// PROFILE SIMULATION
+// =========================
 function sendRequest(type) {
-updateCounter();
-log(`Request from profile: ${type}`);
+updateMetrics(1);
+log(`Request: ${type}`);
 }
 
-// Security tests
+// =========================
+// SECURITY SIMULATION
+// =========================
 function wafTest() {
-updateCounter();
-log("WAF triggered suspicious request blocked");
+updateMetrics(1);
+log("WAF blocked suspicious request");
 }
 
 function rateLimit() {
-updateCounter();
-log("Rate limit triggered (429 simulated)");
+updateMetrics(2);
+log("Rate limit triggered (429)");
 }
 
 function loginAttack() {
-for (let i = 0; i < 5; i++) {
-setTimeout(() => {
-updateCounter();
-log("Fake login attempt detected");
-}, i * 200);
-}
+let i = 0;
+
+const interval = setInterval(() => {
+updateMetrics(1);
+log("Fake login attempt");
+
+i++;
+if (i > 6) clearInterval(interval);
+}, 200);
 }
 
 function errorTest() {
-updateCounter();
-log("404 error simulated");
+updateMetrics(1);
+log("404 generated");
 }
 
 function cacheTest() {
-updateCounter();
-log("Cache HIT simulated");
+updateMetrics(1);
+log("Cache HIT");
 }
 
-// Edge status codes
+// =========================
+// EDGE STATUS SIMULATION
+// =========================
 function sendStatus(code) {
-updateCounter();
+updateMetrics(1);
 
-let message = "";
+const messages = {
+200: "OK",
+201: "Created",
+202: "Accepted",
+301: "Redirect",
+302: "Found",
+403: "Forbidden",
+404: "Not Found",
+410: "Gone",
+429: "Rate Limited",
+499: "Client Closed",
+500: "Server Error",
+502: "Bad Gateway",
+503: "Service Unavailable"
+};
 
-switch (code) {
-case 200: message = "200 OK - Success"; break;
-case 201: message = "201 Created"; break;
-case 202: message = "202 Accepted"; break;
-case 301: message = "301 Redirect"; break;
-case 302: message = "302 Found"; break;
-case 403: message = "403 Forbidden"; break;
-case 404: message = "404 Not Found"; break;
-case 410: message = "410 Gone"; break;
-case 429: message = "429 Rate Limited"; break;
-case 499: message = "499 Client Closed Request"; break;
-case 500: message = "500 Server Error"; break;
-case 502: message = "502 Bad Gateway"; break;
-case 503: message = "503 Service Unavailable"; break;
-default: message = `${code} Unknown`;
-}
-
-log(`Edge Response: ${message}`);
+log(`Edge ${code} - ${messages[code] || "Unknown"}`);
 }
