@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Cloudflare Security Lab</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+
+<div class="dashboard">
+
+
+<h1>☁️ Cloudflare Security Lab</h1>
+
+<p>
+Traffic simulator for Cloudflare Analytics testing
+</p>
+
+
+
+<div class="card">
+
+<h2>Traffic Generator</h2>
+
+
+<button onclick="normalTraffic()">
+Normal Request
+</button>
+
+
+<button onclick="trafficSpike()">
+Traffic Spike
+</button>
+
+
+<button onclick="botSimulation()">
+Bot Traffic
+</button>
+
+
+
+</div>
+
+
+
+<div class="card">
+
+
+<h2>Security Testing</h2>
+
+
+<button onclick="wafTest()">
+WAF Rule Test
+</button>
+
+
+<button onclick="rateLimit()">
+Rate Limit Test
+</button>
+
+
+
+<button onclick="loginAttack()">
+Fake Login Test
+</button>
+
+
+</div>
+
+
+
+<div class="card">
+
+
+<h2>Live Request Counter</h2>
+
+
+<h1 id="counter">
+
+0
+
+</h1>
+
+
+</div>
+
+
+
+
+<div class="card">
+
+
+<h2>JA3 / JA4 Fingerprinting</h2>
+
+
+<p>
+
+JA3 identifies TLS client fingerprints.
+
+Example:
+
+Chrome browser:
+TLS version +
+cipher suites +
+extensions
+
+
+</p>
+
+
+<p>
+
+JA4 improves this by adding more detailed
+network fingerprint information.
+
+</p>
+
+
+</div>
+
+
+
+<div class="card">
+
+
+<h2>Activity Log</h2>
+
+
+<div id="log">
+
+Waiting...
+
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+<script src="script.js"></script>
+
+
+</body>
+
+
+</html>
