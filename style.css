@@ -1,21 +1,35 @@
+*{
+
+box-sizing:border-box;
+
+}
+
+
 body{
 
 
-background:#0b0d10;
+margin:0;
+
+background:#0b0f14;
 
 color:white;
 
-font-family:Arial, Helvetica, sans-serif;
-
-margin:0;
+font-family:Arial;
 
 
 }
 
 
+
 .dashboard{
 
+
+max-width:1400px;
+
+margin:auto;
+
 padding:30px;
+
 
 }
 
@@ -23,20 +37,30 @@ padding:30px;
 
 h1{
 
-color:#f48120;
 
 text-align:center;
+
+color:#f48120;
+
+font-size:38px;
+
 
 }
 
 
+
 .subtitle{
+
 
 text-align:center;
 
 color:#aaa;
 
+margin-bottom:30px;
+
+
 }
+
 
 
 
@@ -45,7 +69,8 @@ color:#aaa;
 
 display:grid;
 
-grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+grid-template-columns:
+repeat(12,1fr);
 
 gap:20px;
 
@@ -54,18 +79,22 @@ gap:20px;
 
 
 
+
 .card{
 
 
-background:#15191f;
+background:#151a21;
 
-border:1px solid #333;
+border:1px solid #2c333b;
 
-border-radius:12px;
+border-radius:14px;
 
 padding:20px;
 
-box-shadow:0 0 20px rgba(244,129,32,.15);
+
+box-shadow:
+
+0 0 20px rgba(244,129,32,.15);
 
 
 }
@@ -74,9 +103,21 @@ box-shadow:0 0 20px rgba(244,129,32,.15);
 
 .full{
 
-grid-column:1/-1;
+
+grid-column:span 12;
+
 
 }
+
+
+.card:not(.full){
+
+
+grid-column:span 4;
+
+
+}
+
 
 
 
@@ -86,9 +127,9 @@ button{
 
 background:#f48120;
 
-border:none;
-
 color:white;
+
+border:none;
 
 padding:10px 15px;
 
@@ -98,28 +139,56 @@ border-radius:8px;
 
 cursor:pointer;
 
-font-weight:bold;
-
 
 }
+
 
 
 button:hover{
 
-background:#ff9d45;
+
+background:#ff9b45;
+
 
 }
+
+
+
+
+.status{
+
+
+display:flex;
+
+flex-wrap:wrap;
+
+
+}
+
 
 
 
 #counter{
 
 
-font-size:50px;
+font-size:55px;
+
+text-align:center;
 
 color:#f48120;
 
-text-align:center;
+font-weight:bold;
+
+
+}
+
+
+
+
+#trafficChart{
+
+
+height:350px!important;
 
 
 }
@@ -130,11 +199,11 @@ text-align:center;
 #log{
 
 
-height:250px;
+height:300px;
 
 overflow:auto;
 
-background:#080909;
+background:#050607;
 
 padding:15px;
 
@@ -142,30 +211,31 @@ border-radius:10px;
 
 font-family:monospace;
 
-color:#00ff88;
+color:#00ff99;
 
 
 }
 
 
 
-canvas{
 
-background:#111;
+@media(max-width:900px){
 
-padding:10px;
 
-border-radius:10px;
+.card,
+.card:not(.full){
+
+grid-column:span 12;
 
 
 }
 
 
+button{
 
-.status button{
-
-width:70px;
+width:100%;
 
 }
 
 
+}
