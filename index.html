@@ -1,60 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Cloudflare Security Lab Pro</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cloudflare Security Lab</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
 
 <div class="dashboard">
 
-<h1>☁️ Cloudflare Security Lab PRO</h1>
-<p class="subtitle">Live Edge Analytics + Bot Intelligence Simulator</p>
+<h1>☁️ Cloudflare Security Lab</h1>
+<p class="subtitle">Full Edge Simulation Dashboard</p>
 
 <div class="grid">
 
 <!-- CHART -->
 <div class="card full">
-<h2>📊 Live Traffic Analytics</h2>
-<canvas id="trafficChart"></canvas>
+<h2>Live Traffic</h2>
+<canvas id="chart"></canvas>
 </div>
 
 <!-- CONTROLS -->
 <div class="card">
-<h2>Traffic Generator</h2>
-<button onclick="normalTraffic()">Normal</button>
-<button onclick="trafficSpike()">Spike</button>
-<button onclick="botSimulation()">Bot Flood</button>
+<h2>Traffic</h2>
+<button onclick="sendTraffic()">Normal</button>
+<button onclick="spamTraffic()">Spike</button>
+<button onclick="botTraffic()">Bot</button>
 </div>
 
 <div class="card">
-<h2>Security Tests</h2>
-<button onclick="wafTest()">WAF (403)</button>
-<button onclick="rateLimit()">Rate Limit (429)</button>
-<button onclick="errorTest()">Error (404)</button>
-</div>
-
-<div class="card">
-<h2>Edge Status Simulator</h2>
+<h2>Status Codes</h2>
 <button onclick="sendStatus(200)">200</button>
-<button onclick="sendStatus(301)">301</button>
-<button onclick="sendStatus(302)">302</button>
 <button onclick="sendStatus(403)">403</button>
 <button onclick="sendStatus(404)">404</button>
 <button onclick="sendStatus(429)">429</button>
 <button onclick="sendStatus(500)">500</button>
-<button onclick="sendStatus(502)">502</button>
-<button onclick="sendStatus(503)">503</button>
 </div>
 
 <!-- COUNTER -->
@@ -63,7 +47,7 @@
 <div id="counter">0</div>
 </div>
 
-<!-- STATUS -->
+<!-- STATUS BREAKDOWN -->
 <div class="card">
 <h2>Status Breakdown</h2>
 <pre id="statusBox">Waiting...</pre>
@@ -71,26 +55,20 @@
 
 <!-- COUNTRY -->
 <div class="card">
-<h2>Country Traffic</h2>
+<h2>Country Stats</h2>
 <pre id="countryBox">Waiting...</pre>
 </div>
 
-<!-- BOT -->
-<div class="card">
-<h2>Bot Intelligence</h2>
-<div id="botAvg">0</div>
-</div>
-
-<!-- LOG -->
+<!-- LOGS -->
 <div class="card full">
 <h2>Activity Logs</h2>
-<div id="log">Waiting for traffic...</div>
+<div id="log">Waiting for requests...</div>
 </div>
 
 </div>
+
 </div>
 
 <script src="script.js"></script>
-
 </body>
 </html>
