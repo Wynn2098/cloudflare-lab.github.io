@@ -1,142 +1,365 @@
-let counter = 0;
+let count = 0;
 
-// ======================
-// DATA BUFFERS (IMPORTANT)
-// ======================
-let eventBuffer = 0;
-let logBuffer = [];
 
-// ======================
-// CHART SETUP
-// ======================
-const ctx = document.getElementById("trafficChart");
+let chartData = [];
 
-const labels = [];
-const dataPoints = [];
 
-const trafficChart = new Chart(ctx, {
-type: "line",
-data: {
-labels,
-datasets: [{
-label: "Requests / sec",
-data: dataPoints,
-borderColor: "#f38020",
-tension: 0.4
+let labels = [];
+
+
+
+const ctx = document
+.getElementById("trafficChart")
+.getContext("2d");
+
+
+
+let chart = new Chart(ctx, {
+
+
+type:"line",
+
+
+data:{
+
+
+labels:labels,
+
+
+datasets:[{
+
+
+label:"Requests / sec",
+
+
+data:chartData,
+
+
+borderWidth:2
+
+
 }]
+
+
 },
-options: {
-animation: false,
-responsive: true,
-scales: { y: { beginAtZero: true } }
+
+
+options:{
+
+
+animation:false,
+
+
+responsive:true
+
+
 }
+
+
 });
 
-// ======================
-// FAST LOG (NO INNERHTML)
-// ======================
-function log(msg) {
-logBuffer.push(`[${new Date().toLocaleTimeString()}] ${msg}`);
-if (logBuffer.length > 30) logBuffer.shift();
+
+
+
+
+const countries=[
+
+"US",
+"PH",
+"JP",
+"DE",
+"SG",
+"GB",
+"CA"
+
+];
+
+
+const browsers=[
+
+"Chrome",
+"Safari",
+"Firefox",
+"Edge"
+
+];
+
+
+
+const statuses=[
+
+200,200,200,
+201,
+202,
+301,
+302,
+403,
+404,
+410,
+429,
+499,
+500,
+502,
+503
+
+];
+
+
+
+
+
+function random(arr){
+
+return arr[Math.floor(Math.random()*arr.length)];
+
 }
 
-// render logs slowly (NOT instantly)
-setInterval(() => {
-const box = document.getElementById("log");
-box.innerHTML = logBuffer.map(l => `<div>${l}</div>`).join("");
-}, 1000);
 
-// ======================
-// CORE ENGINE (BATCHED UPDATE)
-// ======================
-function emitTraffic(value = 1, message = "request") {
-counter += value;
-eventBuffer += value;
-log(message);
 
-document.getElementById("counter").innerText = counter;
+
+function sendRequest(profile="Normal"){
+
+
+let status=random(statuses);
+
+
+
+let request={
+
+
+profile,
+
+status,
+
+
+country:random(countries),
+
+
+browser:random(browsers),
+
+
+latency:Math.floor(Math.random()*300),
+
+
+cache:Math.random()>0.5?"HIT":"MISS"
+
+
+};
+
+
+
+count++;
+
+
+document.getElementById("counter").innerHTML=count;
+
+
+
+addLog(request);
+
+
+updateChart();
+
+
+
 }
 
-// ======================
-// CHART UPDATE LOOP (IMPORTANT FIX)
-// ======================
-setInterval(() => {
-const value = eventBuffer;
 
-const time = new Date().toLocaleTimeString();
 
-labels.push(time);
-dataPoints.push(value);
 
-// keep only last 15 points
-if (labels.length > 15) {
+
+function sendStatus(code){
+
+
+count++;
+
+
+document.getElementById("counter").innerHTML=count;
+
+
+addLog({
+
+profile:"Manual Test",
+
+status:code,
+
+country:"PH",
+
+browser:"Chrome",
+
+latency:120,
+
+cache:"MISS"
+
+
+});
+
+
+updateChart();
+
+
+}
+
+
+
+
+
+
+
+function normalTraffic(){
+
+sendRequest("Normal User");
+
+
+}
+
+
+
+
+function trafficSpike(){
+
+
+for(let i=0;i<20;i++){
+
+sendRequest("Traffic Spike");
+
+}
+
+
+}
+
+
+
+
+function botSimulation(){
+
+
+for(let i=0;i<15;i++){
+
+sendRequest("Bot Traffic");
+
+}
+
+
+}
+
+
+
+
+
+
+function wafTest(){
+
+
+sendStatus(403);
+
+
+}
+
+
+
+function rateLimit(){
+
+
+sendStatus(429);
+
+
+}
+
+
+
+function errorTest(){
+
+
+sendStatus(404);
+
+
+}
+
+
+
+function cacheTest(){
+
+
+sendRequest("Cache Test");
+
+
+}
+
+
+
+
+
+function addLog(data){
+
+
+let log=document.getElementById("log");
+
+
+let line=
+
+
+`[${new Date().toLocaleTimeString()}]
+
+${data.profile}
+
+STATUS:${data.status}
+
+${data.country}
+
+${data.browser}
+
+${data.latency}ms
+
+CACHE:${data.cache}`;
+
+
+
+log.innerHTML=line+"<br><br>"+log.innerHTML;
+
+
+
+}
+
+
+
+
+
+
+function updateChart(){
+
+
+labels.push(new Date().toLocaleTimeString());
+
+
+chartData.push(count);
+
+
+
+if(labels.length>20){
+
 labels.shift();
-dataPoints.shift();
+
+chartData.shift();
+
+
 }
 
-trafficChart.update();
 
-eventBuffer = 0;
-}, 1000);
 
-// ======================
-// SIMULATED BACKGROUND TRAFFIC
-// ======================
-setInterval(() => {
-emitTraffic(Math.floor(Math.random() * 3), "Live traffic stream");
-}, 1200);
+chart.update();
 
-// ======================
-// BUTTON FUNCTIONS
-// ======================
-function normalTraffic() {
-emitTraffic(1, "Normal request");
+
 }
 
-function trafficSpike() {
-for (let i = 0; i < 5; i++) {
-setTimeout(() => {
-emitTraffic(3, "Spike request");
-}, i * 150);
-}
-}
 
-function botSimulation() {
-for (let i = 0; i < 5; i++) {
-setTimeout(() => {
-emitTraffic(2, "Bot request");
-}, i * 200);
-}
-}
 
-function sendRequest(type) {
-emitTraffic(1, `Profile: ${type}`);
-}
 
-function wafTest() {
-emitTraffic(1, "WAF blocked request");
-}
 
-function rateLimit() {
-emitTraffic(2, "Rate limit hit (429)");
-}
+setInterval(()=>{
 
-function loginAttack() {
-for (let i = 0; i < 4; i++) {
-setTimeout(() => {
-emitTraffic(1, "Login attempt blocked");
-}, i * 250);
-}
-}
 
-function errorTest() {
-emitTraffic(1, "404 error");
-}
+sendRequest("Auto Traffic");
 
-function cacheTest() {
-emitTraffic(1, "Cache HIT");
-}
 
-function sendStatus(code) {
-emitTraffic(1, `Edge status ${code}`);
-}
+},3000);
