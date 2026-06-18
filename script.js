@@ -17,9 +17,9 @@ function inc() {
   document.getElementById("counter").innerText = count;
 }
 
-/* -----------------------------
+/* -------------------------
    PROFILE REQUESTS
------------------------------ */
+------------------------- */
 function sendRequest(type) {
   fetch("/api/" + type, {
     headers: {
@@ -32,18 +32,15 @@ function sendRequest(type) {
   log("Sent profile request: " + type);
 }
 
-/* -----------------------------
-   NORMAL TRAFFIC
------------------------------ */
+/* -------------------------
+   BASIC TRAFFIC
+------------------------- */
 function normalTraffic() {
   fetch("/normal");
   inc();
   log("Normal traffic sent");
 }
 
-/* -----------------------------
-   TRAFFIC SPIKE
------------------------------ */
 function trafficSpike() {
   for (let i = 0; i < 100; i++) {
     fetch("/spike");
@@ -52,40 +49,47 @@ function trafficSpike() {
   log("Traffic spike sent (100 requests)");
 }
 
-/* -----------------------------
-   ERROR TEST
------------------------------ */
-function errorTest() {
-  fetch("/this-page-does-not-exist");
-  inc();
-  log("404 test sent");
+function botSimulation() {
+  for (let i = 0; i < 30; i++) {
+    fetch("/bot");
+    inc();
+  }
+  log("Bot simulation sent (30 requests)");
 }
 
-/* -----------------------------
-   CACHE TEST
------------------------------ */
-function cacheTest() {
-  fetch("/image.jpg?cache=" + Date.now());
-  inc();
-  log("Cache test sent");
-}
-
-/* -----------------------------
-   WAF TEST
------------------------------ */
+/* -------------------------
+   SECURITY TESTS
+------------------------- */
 function wafTest() {
   fetch("/admin-panel");
   inc();
   log("WAF test sent");
 }
 
-/* -----------------------------
-   RATE LIMIT TEST
------------------------------ */
 function rateLimit() {
   for (let i = 0; i < 20; i++) {
     fetch("/rate-test");
     inc();
   }
   log("Rate limit test sent");
+}
+
+function loginAttack() {
+  for (let i = 0; i < 15; i++) {
+    fetch("/login", { method: "POST" });
+    inc();
+  }
+  log("Fake login attack simulation sent");
+}
+
+function errorTest() {
+  fetch("/this-page-does-not-exist");
+  inc();
+  log("404 test sent");
+}
+
+function cacheTest() {
+  fetch("/image.jpg?cache=" + Date.now());
+  inc();
+  log("Cache test sent");
 }
