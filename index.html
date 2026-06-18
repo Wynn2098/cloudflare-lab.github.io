@@ -6,7 +6,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Cloudflare Security Lab</title>
+<title>Cloudflare Security Lab Pro</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -14,252 +14,83 @@
 
 </head>
 
-
 <body>
-
 
 <div class="dashboard">
 
-
-<h1>☁️ Cloudflare Security Lab</h1>
-
-<p class="subtitle">
-Traffic Simulation + Edge Analytics Training
-</p>
-
-
+<h1>☁️ Cloudflare Security Lab PRO</h1>
+<p class="subtitle">Live Edge Analytics + Bot Intelligence Simulator</p>
 
 <div class="grid">
 
-
 <!-- CHART -->
-
 <div class="card full">
-
 <h2>📊 Live Traffic Analytics</h2>
-
 <canvas id="trafficChart"></canvas>
-
 </div>
 
-
-
-
-<!-- TRAFFIC -->
-
+<!-- CONTROLS -->
 <div class="card">
-
-
 <h2>Traffic Generator</h2>
-
-
-<button onclick="normalTraffic()">
-Normal Traffic
-</button>
-
-
-<button onclick="trafficSpike()">
-Traffic Spike
-</button>
-
-
-<button onclick="botSimulation()">
-Bot Traffic
-</button>
-
-
+<button onclick="normalTraffic()">Normal</button>
+<button onclick="trafficSpike()">Spike</button>
+<button onclick="botSimulation()">Bot Flood</button>
 </div>
 
-
-
-
-
-
-<!-- PROFILE -->
-
 <div class="card">
-
-
-<h2>Traffic Profiles</h2>
-
-
-<button onclick="sendRequest('Chrome Windows')">
-Chrome Windows
-</button>
-
-
-<button onclick="sendRequest('Safari iOS')">
-Safari iOS
-</button>
-
-
-<button onclick="sendRequest('Android')">
-Android
-</button>
-
-
-<button onclick="sendRequest('Bot')">
-Bot
-</button>
-
-
+<h2>Security Tests</h2>
+<button onclick="wafTest()">WAF (403)</button>
+<button onclick="rateLimit()">Rate Limit (429)</button>
+<button onclick="errorTest()">Error (404)</button>
 </div>
 
-
-
-
-
-
-<!-- SECURITY -->
-
 <div class="card">
-
-
-<h2>Security Testing</h2>
-
-
-<button onclick="sendStatus(403)">
-WAF Block
-</button>
-
-
-<button onclick="sendStatus(429)">
-Rate Limit
-</button>
-
-
-<button onclick="sendStatus(404)">
-404 Test
-</button>
-
-
-</div>
-
-
-
-
-
-
-<!-- STATUS -->
-
-<div class="card">
-
-
 <h2>Edge Status Simulator</h2>
-
-
-<div class="status">
-
-
-<button onclick="sendStatus(200)">
-200
-</button>
-
-
-<button onclick="sendStatus(301)">
-301
-</button>
-
-
-<button onclick="sendStatus(302)">
-302
-</button>
-
-
-<button onclick="sendStatus(403)">
-403
-</button>
-
-
-<button onclick="sendStatus(404)">
-404
-</button>
-
-
-<button onclick="sendStatus(429)">
-429
-</button>
-
-
-<button onclick="sendStatus(500)">
-500
-</button>
-
-
-<button onclick="sendStatus(502)">
-502
-</button>
-
-
-<button onclick="sendStatus(503)">
-503
-</button>
-
-
-
+<button onclick="sendStatus(200)">200</button>
+<button onclick="sendStatus(301)">301</button>
+<button onclick="sendStatus(302)">302</button>
+<button onclick="sendStatus(403)">403</button>
+<button onclick="sendStatus(404)">404</button>
+<button onclick="sendStatus(429)">429</button>
+<button onclick="sendStatus(500)">500</button>
+<button onclick="sendStatus(502)">502</button>
+<button onclick="sendStatus(503)">503</button>
 </div>
-
-
-</div>
-
-
-
-
-
 
 <!-- COUNTER -->
-
-
 <div class="card">
-
-
 <h2>Total Requests</h2>
-
-
-<div id="counter">
-
-0
-
+<div id="counter">0</div>
 </div>
 
-
+<!-- STATUS -->
+<div class="card">
+<h2>Status Breakdown</h2>
+<pre id="statusBox">Waiting...</pre>
 </div>
 
+<!-- COUNTRY -->
+<div class="card">
+<h2>Country Traffic</h2>
+<pre id="countryBox">Waiting...</pre>
+</div>
 
-
-
-
-
+<!-- BOT -->
+<div class="card">
+<h2>Bot Intelligence</h2>
+<div id="botAvg">0</div>
+</div>
 
 <!-- LOG -->
-
-
 <div class="card full">
-
-
 <h2>Activity Logs</h2>
-
-
-<div id="log">
-
-Waiting...
-
+<div id="log">Waiting for traffic...</div>
 </div>
 
-
 </div>
-
-
-
 </div>
-
-
-</div>
-
 
 <script src="script.js"></script>
 
-
 </body>
-
 </html>
