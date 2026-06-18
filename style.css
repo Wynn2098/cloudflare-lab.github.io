@@ -1,110 +1,82 @@
-* {
-  box-sizing: border-box;
-}
-
 body {
-  margin: 0;
-  background: #0b0f14;
-  color: white;
-  font-family: Arial, sans-serif;
+margin: 0;
+background: #0b0f14;
+color: white;
+font-family: Arial;
 }
 
 .dashboard {
-  max-width: 1400px;
-  margin: auto;
-  padding: 30px;
+max-width: 1200px;
+margin: auto;
+padding: 20px;
 }
 
 h1 {
-  text-align: center;
-  color: #f48120;
-  font-size: 36px;
+text-align: center;
+color: #f48120;
 }
 
 .subtitle {
-  text-align: center;
-  color: #9aa4b2;
-  margin-bottom: 25px;
+text-align: center;
+color: #aaa;
+margin-bottom: 20px;
 }
 
 .grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 18px;
+display: grid;
+grid-template-columns: repeat(12, 1fr);
+gap: 15px;
 }
 
 .card {
-  background: #151a21;
-  border: 1px solid #2b313a;
-  border-radius: 14px;
-  padding: 18px;
-  box-shadow: 0 0 20px rgba(244,129,32,0.1);
+background: #151a21;
+border-radius: 12px;
+padding: 15px;
+border: 1px solid #2a2f36;
 }
 
 .full {
-  grid-column: span 12;
+grid-column: span 12;
 }
 
 .card:not(.full) {
-  grid-column: span 4;
-}
-
-h2 {
-  font-size: 16px;
-  margin-top: 0;
-  color: #f5f5f5;
-  border-bottom: 1px solid #2b313a;
-  padding-bottom: 8px;
+grid-column: span 4;
 }
 
 button {
-  background: #f48120;
-  color: white;
-  border: none;
-  padding: 10px 12px;
-  margin: 4px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 13px;
+background: #f48120;
+border: none;
+padding: 8px 12px;
+margin: 4px;
+color: white;
+border-radius: 6px;
+cursor: pointer;
 }
 
 button:hover {
-  background: #ff9a3d;
+background: #ff9b3d;
 }
 
 #counter {
-  font-size: 50px;
-  text-align: center;
-  color: #f48120;
-  font-weight: bold;
+font-size: 40px;
+text-align: center;
+color: #f48120;
 }
 
 #log {
-  height: 300px;
-  overflow: auto;
-  background: #0a0e12;
-  padding: 12px;
-  border-radius: 10px;
-  font-family: monospace;
-  font-size: 12px;
-  color: #00ff99;
+height: 250px;
+overflow: auto;
+background: #0a0d10;
+padding: 10px;
+font-size: 12px;
+font-family: monospace;
+color: #00ff99;
+border-radius: 8px;
 }
 
 pre {
-  background: #0a0e12;
-  padding: 10px;
-  border-radius: 10px;
-  color: #00ff99;
-  font-size: 12px;
-  overflow: auto;
-}
-
-canvas {
-  height: 320px !important;
-}
-
-@media(max-width: 900px) {
-  .card:not(.full) {
-    grid-column: span 12;
-  }
+background: #0a0d10;
+padding: 10px;
+border-radius: 8px;
+color: #00ff99;
 }
