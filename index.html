@@ -3,51 +3,99 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Edge Analytics Lab</title>
-
-<link rel="stylesheet" href="style.css">
+<title>Cloudflare Security Lab</title>
+  
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <div class="dashboard">
 
-<h1>☁️ Edge Analytics Lab</h1>
-<p class="subtitle">Real-time traffic + bot detection simulation</p>
+<h1>☁️ Cloudflare Security Lab</h1>
+<p class="subtitle">Traffic simulation + analytics learning dashboard</p>
 
 <div class="grid">
-
+  
+<div class="card full">
+<h2>📊 Live Traffic Analytics</h2>
+<canvas id="trafficChart"></canvas>
+</div>
+  
+<!-- TRAFFIC GENERATOR -->
 <div class="card">
-<h2>Controls</h2>
-<button onclick="sendEvent('normal')">Normal Traffic</button>
-<button onclick="sendEvent('bot')">Bot Traffic</button>
-<button onclick="sendEvent('spike')">Traffic Spike</button>
+<h2>Traffic Generator</h2>
+<button onclick="normalTraffic()">Normal Request</button>
+<button onclick="trafficSpike()">Traffic Spike</button>
+<button onclick="botSimulation()">Bot Traffic</button>
 </div>
 
+<!-- PROFILE TRAFFIC -->
 <div class="card">
-<h2>Live Counter</h2>
+<h2>Traffic Profiles</h2>
+<button onclick="sendRequest('chrome_win')">Chrome Windows</button>
+<button onclick="sendRequest('chrome_mac')">Chrome Mac</button>
+<button onclick="sendRequest('safari_ios')">Safari iOS</button>
+<button onclick="sendRequest('android')">Android</button>
+<button onclick="sendRequest('bot')">Bot Profile</button>
+</div>
+
+<!-- SECURITY TESTING -->
+<div class="card">
+<h2>Security Testing</h2>
+<button onclick="wafTest()">WAF Test</button>
+<button onclick="rateLimit()">Rate Limit Test</button>
+<button onclick="loginAttack()">Fake Login Test</button>
+<button onclick="errorTest()">404 Test</button>
+<button onclick="cacheTest()">Cache Test</button>
+</div>
+
+<!-- EDGE STATUS CODES -->
+<div class="card">
+<h2>Edge Status Code Simulator</h2>
+
+<button onclick="sendStatus(200)">200 OK</button>
+<button onclick="sendStatus(201)">201 Created</button>
+<button onclick="sendStatus(202)">202 Accepted</button>
+
+<button onclick="sendStatus(301)">301 Redirect</button>
+<button onclick="sendStatus(302)">302 Found</button>
+
+<button onclick="sendStatus(403)">403 Forbidden</button>
+<button onclick="sendStatus(404)">404 Not Found</button>
+<button onclick="sendStatus(410)">410 Gone</button>
+
+<button onclick="sendStatus(429)">429 Rate Limited</button>
+<button onclick="sendStatus(499)">499 Client Closed</button>
+
+<button onclick="sendStatus(500)">500 Server Error</button>
+<button onclick="sendStatus(502)">502 Bad Gateway</button>
+<button onclick="sendStatus(503)">503 Service Unavailable</button>
+</div>
+
+<!-- LIVE COUNTER -->
+<div class="card">
+<h2>Live Request Counter</h2>
 <div id="counter">0</div>
 </div>
 
-<div class="card">
-<h2>Bot Rate</h2>
-<div id="botRate">0%</div>
-</div>
-
+<!-- LOG -->
 <div class="card full">
-<h2>Live Traffic Graph</h2>
-<canvas id="chart"></canvas>
-</div>
-
-<div class="card full">
-<h2>Event Stream</h2>
-<div id="log"></div>
+<h2>Activity Log</h2>
+<div id="log">Waiting...</div>
 </div>
 
 </div>
 </div>
 
 <script src="script.js"></script>
+
 </body>
 </html>
+
+
+
+
+create an js and css and workers js as well 
+make the css cloudflared themes
