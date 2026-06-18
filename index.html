@@ -1,95 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Cloudflare Security Lab</title>
-  
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <link rel="stylesheet" href="style.css">
+
 </head>
+
 
 <body>
 
+
 <div class="dashboard">
 
+
 <h1>☁️ Cloudflare Security Lab</h1>
-<p class="subtitle">Traffic simulation + analytics learning dashboard</p>
+
+<p class="subtitle">
+Traffic simulation + edge analytics learning dashboard
+</p>
+
+
 
 <div class="grid">
-  
+
+
+
 <div class="card full">
-<h2>📊 Live Traffic Analytics</h2>
+
+<h2>📊 Live Edge Traffic Analytics</h2>
+
 <canvas id="trafficChart"></canvas>
+
 </div>
-  
-<!-- TRAFFIC GENERATOR -->
+
+
+
+
 <div class="card">
+
 <h2>Traffic Generator</h2>
-<button onclick="normalTraffic()">Normal Request</button>
-<button onclick="trafficSpike()">Traffic Spike</button>
-<button onclick="botSimulation()">Bot Traffic</button>
+
+<button onclick="normalTraffic()">
+Normal Request
+</button>
+
+
+<button onclick="trafficSpike()">
+Traffic Spike
+</button>
+
+
+<button onclick="botSimulation()">
+Bot Traffic
+</button>
+
+
 </div>
 
-<!-- PROFILE TRAFFIC -->
+
+
+
 <div class="card">
+
 <h2>Traffic Profiles</h2>
-<button onclick="sendRequest('chrome_win')">Chrome Windows</button>
-<button onclick="sendRequest('chrome_mac')">Chrome Mac</button>
-<button onclick="sendRequest('safari_ios')">Safari iOS</button>
-<button onclick="sendRequest('android')">Android</button>
-<button onclick="sendRequest('bot')">Bot Profile</button>
+
+
+<button onclick="sendRequest('Chrome Windows')">
+Chrome Windows
+</button>
+
+
+<button onclick="sendRequest('Chrome Mac')">
+Chrome Mac
+</button>
+
+
+<button onclick="sendRequest('Safari iOS')">
+Safari iOS
+</button>
+
+
+<button onclick="sendRequest('Android')">
+Android
+</button>
+
+
+<button onclick="sendRequest('Bot')">
+Bot
+</button>
+
+
 </div>
 
-<!-- SECURITY TESTING -->
+
+
+
+
 <div class="card">
+
+
 <h2>Security Testing</h2>
-<button onclick="wafTest()">WAF Test</button>
-<button onclick="rateLimit()">Rate Limit Test</button>
-<button onclick="loginAttack()">Fake Login Test</button>
-<button onclick="errorTest()">404 Test</button>
-<button onclick="cacheTest()">Cache Test</button>
+
+
+<button onclick="wafTest()">
+WAF Block
+</button>
+
+
+<button onclick="rateLimit()">
+429 Rate Limit
+</button>
+
+
+<button onclick="errorTest()">
+404 Error
+</button>
+
+
+<button onclick="cacheTest()">
+Cache Test
+</button>
+
+
 </div>
 
-<!-- EDGE STATUS CODES -->
+
+
+
+
+
 <div class="card">
-<h2>Edge Status Code Simulator</h2>
 
-<button onclick="sendStatus(200)">200 OK</button>
-<button onclick="sendStatus(201)">201 Created</button>
-<button onclick="sendStatus(202)">202 Accepted</button>
 
-<button onclick="sendStatus(301)">301 Redirect</button>
-<button onclick="sendStatus(302)">302 Found</button>
+<h2>Edge Status Simulator</h2>
 
-<button onclick="sendStatus(403)">403 Forbidden</button>
-<button onclick="sendStatus(404)">404 Not Found</button>
-<button onclick="sendStatus(410)">410 Gone</button>
 
-<button onclick="sendStatus(429)">429 Rate Limited</button>
-<button onclick="sendStatus(499)">499 Client Closed</button>
+<div class="status">
 
-<button onclick="sendStatus(500)">500 Server Error</button>
-<button onclick="sendStatus(502)">502 Bad Gateway</button>
-<button onclick="sendStatus(503)">503 Service Unavailable</button>
+
+<button onclick="sendStatus(200)">200</button>
+
+<button onclick="sendStatus(201)">201</button>
+
+<button onclick="sendStatus(202)">202</button>
+
+
+<button onclick="sendStatus(301)">301</button>
+
+<button onclick="sendStatus(302)">302</button>
+
+
+<button onclick="sendStatus(403)">403</button>
+
+<button onclick="sendStatus(404)">404</button>
+
+<button onclick="sendStatus(410)">410</button>
+
+
+<button onclick="sendStatus(429)">429</button>
+
+<button onclick="sendStatus(499)">499</button>
+
+
+<button onclick="sendStatus(500)">500</button>
+
+<button onclick="sendStatus(502)">502</button>
+
+<button onclick="sendStatus(503)">503</button>
+
+
 </div>
 
-<!-- LIVE COUNTER -->
+
+</div>
+
+
+
+
+
+
 <div class="card">
-<h2>Live Request Counter</h2>
-<div id="counter">0</div>
+
+
+<h2>Live Requests</h2>
+
+<div id="counter">
+0
 </div>
 
-<!-- LOG -->
+
+</div>
+
+
+
+
+
+
+
 <div class="card full">
-<h2>Activity Log</h2>
-<div id="log">Waiting...</div>
-</div>
+
+
+<h2>Request Logs</h2>
+
+<div id="log">
+
+Waiting for traffic...
 
 </div>
+
+
 </div>
+
+
+
+
+
+</div>
+
+
+</div>
+
 
 <script src="script.js"></script>
 
+
 </body>
+
 </html>
