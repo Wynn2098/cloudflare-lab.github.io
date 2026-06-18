@@ -1,10 +1,14 @@
+const CLOUDFLARE_URL =
+"https://cloudflarelab.wincapz20.workers.dev";
+
+
 let count = 0;
 
-
-let chartData = [];
-
-
 let labels = [];
+
+let values = [];
+
+
 
 
 
@@ -14,7 +18,7 @@ const ctx = document
 
 
 
-let chart = new Chart(ctx, {
+const chart = new Chart(ctx, {
 
 
 type:"line",
@@ -28,15 +32,11 @@ labels:labels,
 
 datasets:[{
 
+label:"Cloudflare Requests",
 
-label:"Requests / sec",
-
-
-data:chartData,
-
+data:values,
 
 borderWidth:2
-
 
 }]
 
@@ -48,7 +48,6 @@ options:{
 
 
 animation:false,
-
 
 responsive:true
 
@@ -62,143 +61,284 @@ responsive:true
 
 
 
-const countries=[
-
-"US",
-"PH",
-"JP",
-"DE",
-"SG",
-"GB",
-"CA"
-
-];
-
-
-const browsers=[
-
-"Chrome",
-"Safari",
-"Firefox",
-"Edge"
-
-];
-
-
-
-const statuses=[
-
-200,200,200,
-201,
-202,
-301,
-302,
-403,
-404,
-410,
-429,
-499,
-500,
-502,
-503
-
-];
-
-
-
-
-
 function random(arr){
 
-return arr[Math.floor(Math.random()*arr.length)];
+return arr[
+Math.floor(Math.random()*arr.length)
+];
 
 }
 
 
 
 
-function sendRequest(profile="Normal"){
 
 
-let status=random(statuses);
+async function sendRequest(profile="Normal Traffic"){
+
+
+let status =
+random([
+
+200,
+200,
+200,
+301,
+302,
+403,
+404,
+429,
+500,
+502,
+503
+
+]);
 
 
 
-let request={
+await sendToCloudflare(status);
 
+
+
+createLog({
 
 profile,
 
 status,
 
-
-country:random(countries),
-
-
-browser:random(browsers),
-
-
-latency:Math.floor(Math.random()*300),
-
-
-cache:Math.random()>0.5?"HIT":"MISS"
+country:
+random([
+"PH",
+"US",
+"JP",
+"SG"
+]),
 
 
-};
-
-
-
-count++;
-
-
-document.getElementById("counter").innerHTML=count;
-
-
-
-addLog(request);
-
-
-updateChart();
-
-
-
-}
-
-
-
-
-
-function sendStatus(code){
-
-
-count++;
-
-
-document.getElementById("counter").innerHTML=count;
-
-
-addLog({
-
-profile:"Manual Test",
-
-status:code,
-
-country:"PH",
-
-browser:"Chrome",
-
-latency:120,
-
-cache:"MISS"
+latency:
+Math.floor(
+Math.random()*300
+)
 
 
 });
 
 
-updateChart();
+
+}
+
+
+
+
+
+
+
+
+
+async function sendStatus(code){
+
+
+
+await sendToCloudflare(code);
+
+
+
+createLog({
+
+
+profile:
+"Manual Edge Status Test",
+
+
+status:code,
+
+
+country:"PH",
+
+
+latency:100
+
+
+});
+
 
 
 }
+
+
+
+
+
+
+
+
+
+async function sendToCloudflare(status){
+
+
+
+try{
+
+
+await fetch(
+
+`${CLOUDFLARE_URL}/?status=${status}&time=${Date.now()}`,
+
+
+{
+
+method:"GET",
+
+mode:"no-cors",
+
+cache:"no-store"
+
+
+}
+
+
+
+);
+
+
+
+console.log(
+"Sent to Cloudflare:",
+status
+);
+
+
+
+}
+
+
+catch(error){
+
+
+console.error(
+"Cloudflare request failed",
+error
+);
+
+
+}
+
+
+
+
+
+count++;
+
+
+
+document
+.getElementById("counter")
+.innerHTML=count;
+
+
+
+updateChart();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+function createLog(data){
+
+
+
+let log =
+document.getElementById("log");
+
+
+
+let entry =
+
+`
+
+[${new Date()
+.toLocaleTimeString()}]
+
+
+EDGE STATUS:
+${data.status}
+
+
+PROFILE:
+${data.profile}
+
+
+COUNTRY:
+${data.country}
+
+
+LATENCY:
+${data.latency}ms
+
+
+-------------------------
+
+`;
+
+
+
+log.innerHTML =
+entry + log.innerHTML;
+
+
+}
+
+
+
+
+
+
+
+
+function updateChart(){
+
+
+
+labels.push(
+new Date()
+.toLocaleTimeString()
+);
+
+
+
+values.push(count);
+
+
+
+
+if(labels.length > 20){
+
+
+labels.shift();
+
+
+values.shift();
+
+
+}
+
+
+
+chart.update();
+
+
+}
+
+
 
 
 
@@ -208,10 +348,17 @@ updateChart();
 
 function normalTraffic(){
 
-sendRequest("Normal User");
+
+sendRequest(
+"Normal User"
+);
 
 
 }
+
+
+
+
 
 
 
@@ -219,14 +366,23 @@ sendRequest("Normal User");
 function trafficSpike(){
 
 
-for(let i=0;i<20;i++){
 
-sendRequest("Traffic Spike");
+for(let i=0;i<30;i++){
+
+
+sendRequest(
+"Traffic Spike"
+);
+
 
 }
 
 
 }
+
+
+
+
 
 
 
@@ -234,14 +390,21 @@ sendRequest("Traffic Spike");
 function botSimulation(){
 
 
-for(let i=0;i<15;i++){
 
-sendRequest("Bot Traffic");
+for(let i=0;i<20;i++){
+
+
+sendRequest(
+"Bot Traffic"
+);
+
 
 }
 
 
 }
+
+
 
 
 
@@ -258,6 +421,10 @@ sendStatus(403);
 
 
 
+
+
+
+
 function rateLimit(){
 
 
@@ -265,6 +432,10 @@ sendStatus(429);
 
 
 }
+
+
+
+
 
 
 
@@ -278,79 +449,21 @@ sendStatus(404);
 
 
 
+
+
+
+
 function cacheTest(){
 
 
-sendRequest("Cache Test");
+sendRequest(
+"Cache Test"
+);
 
 
 }
 
 
-
-
-
-function addLog(data){
-
-
-let log=document.getElementById("log");
-
-
-let line=
-
-
-`[${new Date().toLocaleTimeString()}]
-
-${data.profile}
-
-STATUS:${data.status}
-
-${data.country}
-
-${data.browser}
-
-${data.latency}ms
-
-CACHE:${data.cache}`;
-
-
-
-log.innerHTML=line+"<br><br>"+log.innerHTML;
-
-
-
-}
-
-
-
-
-
-
-function updateChart(){
-
-
-labels.push(new Date().toLocaleTimeString());
-
-
-chartData.push(count);
-
-
-
-if(labels.length>20){
-
-labels.shift();
-
-chartData.shift();
-
-
-}
-
-
-
-chart.update();
-
-
-}
 
 
 
@@ -359,7 +472,9 @@ chart.update();
 setInterval(()=>{
 
 
-sendRequest("Auto Traffic");
+sendRequest(
+"Automatic Traffic"
+);
 
 
-},3000);
+},5000);
