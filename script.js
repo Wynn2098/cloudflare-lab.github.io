@@ -1,93 +1,66 @@
-const WORKER_URL = "https://cloudflarelab-api.wincapz20.workers.dev/";
+const API = "https://cloudflarelab-api.wincapz20.workers.dev/";
 
-let requestCount = 0;
+let total = 0;
+let bots = 0;
+let events = [];
 
-let labelsArr = [];
-let chartDataArr = [];
-
-let statusMap = {};
-let countryMap = {};
-
-const ctx = document.getElementById("chart").getContext("2d");
+const ctx = document.getElementById("chart");
 
 const chart = new Chart(ctx, {
 type: "line",
 data: {
-labels: labelsArr,
+labels: [],
 datasets: [{
-label: "Requests",
-data: chartDataArr,
-borderWidth: 2
+label: "Requests/sec",
+data: [],
+borderColor: "#f38020",
+tension: 0.3
 }]
 },
 options: {
-animation: false,
-responsive: true
+animation: false
 }
 });
 
-async function callWorker(statusCode, attackType = "normal") {
+// --------------------
+// SEND EVENT TO WORKER
+// --------------------
+async function sendEvent(type) {
 
-const res = await fetch(`${WORKER_URL}/?status=${statusCode}&type=${attackType}`);
-const json = await res.json();
+await fetch(API, {
+method: "POST",
+body: JSON.stringify({ type })
+});
 
-requestCount++;
-
-document.getElementById("counter").innerText = requestCount;
-
-// STATUS MAP
-statusMap[json.status] = (statusMap[json.status] || 0) + 1;
-
-// COUNTRY MAP
-countryMap[json.country] = (countryMap[json.country] || 0) + 1;
-
-updateUI(json);
 }
 
-function updateUI(res) {
+// --------------------
+// FETCH LIVE DATA
+// --------------------
+async function update() {
 
-labelsArr.push(new Date().toLocaleTimeString());
-chartDataArr.push(requestCount);
+const res = await fetch(API);
+const data = await res.json();
 
-if (labelsArr.length > 20) {
-labelsArr.shift();
-chartDataArr.shift();
-}
+total = data.total;
+bots = data.bots;
+events = data.events;
 
+document.getElementById("counter").innerText = total;
+document.getElementById("botRate").innerText =
+total ? Math.round((bots / total) * 100) + "%" : "0%";
+
+// chart update
+chart.data.labels = data.series.map(x => x.time);
+chart.data.datasets[0].data = data.series.map(x => x.value);
 chart.update();
 
-// LOGS
-document.getElementById("log").innerHTML =
-`[${new Date().toLocaleTimeString()}]
-STATUS: ${res.status}
-COUNTRY: ${res.country}
-BOT SCORE: ${res.botScore}
-CACHE: ${res.cache}
-WAF: ${res.waf}
-DDoS FLAG: ${res.ddos}
--------------------<br>` + document.getElementById("log").innerHTML;
-
-// STATUS BREAKDOWN
-document.getElementById("statusBox").innerText =
-JSON.stringify(statusMap, null, 2);
-
-// COUNTRY BREAKDOWN
-document.getElementById("countryBox").innerText =
-JSON.stringify(countryMap, null, 2);
+// log
+const log = document.getElementById("log");
+log.innerHTML = data.events.slice(-20).map(e =>
+`[${e.time}] ${e.type}`
+).join("<br>");
 }
 
-/* TRAFFIC BUTTONS */
-function sendTraffic(){ callWorker(200, "normal"); }
-
-function spamTraffic(){
-for(let i=0;i<10;i++) callWorker(200, "burst");
-}
-
-function botTraffic(){
-for(let i=0;i<10;i++) callWorker(403, "bot");
-}
-
-/* EDGE STATUS SIMULATION */
-function sendStatus(code){
-callWorker(code, "manual");
-}
+// live refresh (WebSocket simulation)
+setInterval(update, 1000);
