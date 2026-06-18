@@ -1,210 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 <meta charset="UTF-8">
-<title>Cloudflare Traffic Intelligence Lab</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloudflare Security Lab</title>
 
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background: #0b1220;
-  color: white;
-  margin: 0;
-  padding: 0;
-}
-
-.dashboard {
-  width: 90%;
-  margin: auto;
-  padding: 20px;
-}
-
-h1 {
-  text-align: center;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-
-.card {
-  background: #111b2e;
-  padding: 20px;
-  border-radius: 12px;
-}
-
-button {
-  width: 100%;
-  margin: 6px 0;
-  padding: 10px;
-  cursor: pointer;
-  border: none;
-  border-radius: 6px;
-  background: #38bdf8;
-  color: black;
-  font-weight: bold;
-}
-
-button:hover {
-  background: #0ea5e9;
-}
-
-#log {
-  background: black;
-  padding: 10px;
-  min-height: 80px;
-  font-size: 14px;
-  overflow-wrap: break-word;
-}
-
-#counter {
-  font-size: 40px;
-}
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <div class="dashboard">
 
-<h1>☁️ Cloudflare Traffic Intelligence Lab</h1>
-
-<p style="text-align:center;">
-Simulated traffic + Cloudflare analytics learning dashboard
-</p>
+<h1>☁️ Cloudflare Security Lab</h1>
+<p class="subtitle">Traffic simulation + analytics learning dashboard</p>
 
 <div class="grid">
 
-<!-- TRAFFIC PROFILES -->
+<!-- TRAFFIC GENERATOR -->
+<div class="card">
+<h2>Traffic Generator</h2>
+<button onclick="normalTraffic()">Normal Request</button>
+<button onclick="trafficSpike()">Traffic Spike</button>
+<button onclick="botSimulation()">Bot Traffic</button>
+</div>
+
+<!-- PROFILE TRAFFIC -->
 <div class="card">
 <h2>Traffic Profiles</h2>
 <button onclick="sendRequest('chrome_win')">Chrome Windows</button>
 <button onclick="sendRequest('chrome_mac')">Chrome Mac</button>
 <button onclick="sendRequest('safari_ios')">Safari iOS</button>
 <button onclick="sendRequest('android')">Android</button>
-<button onclick="sendRequest('bot')">Bot Traffic</button>
+<button onclick="sendRequest('bot')">Bot Profile</button>
 </div>
 
-<!-- EDGE TESTS -->
+<!-- SECURITY TESTING -->
 <div class="card">
-<h2>Edge Tests</h2>
-<button onclick="normalTraffic()">Normal Traffic</button>
-<button onclick="trafficSpike()">Traffic Spike</button>
-<button onclick="errorTest()">404 Test</button>
-<button onclick="cacheTest()">Cache Test</button>
+<h2>Security Testing</h2>
 <button onclick="wafTest()">WAF Test</button>
 <button onclick="rateLimit()">Rate Limit Test</button>
+<button onclick="loginAttack()">Fake Login Test</button>
+<button onclick="errorTest()">404 Test</button>
+<button onclick="cacheTest()">Cache Test</button>
 </div>
 
-<!-- STATS -->
+<!-- LIVE COUNTER -->
 <div class="card">
-<h2>Live Counter</h2>
+<h2>Live Request Counter</h2>
 <div id="counter">0</div>
+</div>
 
-<h3>Activity Log</h3>
+<!-- LOG -->
+<div class="card full">
+<h2>Activity Log</h2>
 <div id="log">Waiting...</div>
 </div>
 
 </div>
-
 </div>
 
-<script>
-let count = 0;
-
-const agents = {
-  chrome_win: "Chrome / Windows UA",
-  chrome_mac: "Chrome / macOS UA",
-  safari_ios: "Safari / iOS UA",
-  android: "Android UA",
-  bot: "Cloudflare-Lab-Bot"
-};
-
-function log(msg) {
-  document.getElementById("log").innerText = msg;
-}
-
-function inc() {
-  count++;
-  document.getElementById("counter").innerText = count;
-}
-
-/* -----------------------------
-   PROFILE REQUESTS
------------------------------ */
-function sendRequest(type) {
-  fetch("/api/" + type, {
-    headers: {
-      "User-Agent": agents[type] || "default",
-      "X-Lab-Type": type
-    }
-  });
-
-  inc();
-  log("Sent profile request: " + type);
-}
-
-/* -----------------------------
-   NORMAL TRAFFIC
------------------------------ */
-function normalTraffic() {
-  fetch("/normal");
-  inc();
-  log("Normal traffic sent");
-}
-
-/* -----------------------------
-   TRAFFIC SPIKE
------------------------------ */
-function trafficSpike() {
-  for (let i = 0; i < 100; i++) {
-    fetch("/spike");
-    inc();
-  }
-  log("Traffic spike sent (100 requests)");
-}
-
-/* -----------------------------
-   ERROR TEST
------------------------------ */
-function errorTest() {
-  fetch("/this-page-does-not-exist");
-  inc();
-  log("404 test sent");
-}
-
-/* -----------------------------
-   CACHE TEST
------------------------------ */
-function cacheTest() {
-  fetch("/image.jpg?cache=" + Date.now());
-  inc();
-  log("Cache test sent");
-}
-
-/* -----------------------------
-   WAF TEST
------------------------------ */
-function wafTest() {
-  fetch("/admin-panel");
-  inc();
-  log("WAF test sent");
-}
-
-/* -----------------------------
-   RATE LIMIT TEST
------------------------------ */
-function rateLimit() {
-  for (let i = 0; i < 20; i++) {
-    fetch("/rate-test");
-    inc();
-  }
-  log("Rate limit test sent");
-}
-</script>
+<script src="script.js"></script>
 
 </body>
 </html>
