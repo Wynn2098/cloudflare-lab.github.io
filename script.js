@@ -1,128 +1,84 @@
-const API = "https://cloudflarelab-api.yourname.workers.dev";
+const WORKER_URL = "https://cloudflarelab-api.wincapz20.workers.dev/";
 
-let total = 0;
+let count = 0;
 
-let chartLabels = [];
-let chartData = [];
+let labels = [];
+let data = [];
 
 let statusMap = {};
 let countryMap = {};
-let botScores = [];
 
-const ctx = document.getElementById("trafficChart").getContext("2d");
+const ctx = document.getElementById("chart").getContext("2d");
 
 const chart = new Chart(ctx, {
-  type: "line",
-  data: {
-    labels: chartLabels,
-    datasets: [{
-      label: "Requests/sec",
-      data: chartData,
-      borderWidth: 2
-    }]
-  },
-  options: {
-    animation: false,
-    responsive: true
-  }
+type: "line",
+data: {
+labels,
+datasets: [{
+label: "Requests",
+data,
+borderWidth: 2
+}]
+},
+options: {
+animation: false,
+responsive: true
+}
 });
 
-function updateChart() {
-  chartLabels.push(new Date().toLocaleTimeString());
-  chartData.push(total);
-
-  if (chartLabels.length > 30) {
-    chartLabels.shift();
-    chartData.shift();
-  }
-
-  chart.update();
+function random(arr){
+return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function updateStats(data) {
+async function callWorker(status){
 
-  // STATUS BREAKDOWN
-  statusMap[data.edgeStatus] = (statusMap[data.edgeStatus] || 0) + 1;
+const res = await fetch(`${WORKER_URL}/?status=${status}`);
+const json = await res.json();
 
-  // COUNTRY MAP
-  countryMap[data.country] = (countryMap[data.country] || 0) + 1;
+count++;
 
-  // BOT SCORE
-  botScores.push(data.botScore);
+document.getElementById("counter").innerText = count;
 
-  if (botScores.length > 100) botScores.shift();
+// STATUS MAP
+statusMap[json.status] = (statusMap[json.status] || 0) + 1;
 
-  renderStats();
+// COUNTRY MAP
+countryMap[json.country] = (countryMap[json.country] || 0) + 1;
+
+updateUI(json);
 }
 
-function renderStats() {
-  console.clear();
-  console.log("STATUS MAP:", statusMap);
-  console.log("COUNTRY MAP:", countryMap);
-  console.log("AVG BOT SCORE:",
-    botScores.reduce((a,b)=>a+b,0)/botScores.length
-  );
+function updateUI(data){
+
+labels.push(new Date().toLocaleTimeString());
+data.push(count);
+
+if(labels.length > 20){
+labels.shift();
+data.shift();
 }
 
-async function sendRequest(profile="normal") {
+chart.update();
 
-  const statusPool = [200,200,200,301,302,403,404,429,500,502,503];
-  const status = statusPool[Math.floor(Math.random()*statusPool.length)];
+document.getElementById("log").innerHTML =
+`[${new Date().toLocaleTimeString()}]
+STATUS: ${data.status}
+COUNTRY: ${data.country}
+BOT: ${data.botScore}
+CACHE: ${data.cache}
+-------------------<br>` + document.getElementById("log").innerHTML;
 
-  const res = await fetch(`${API}?status=${status}&t=${Date.now()}`);
-  const data = await res.json();
+document.getElementById("statusBox").innerText =
+JSON.stringify(statusMap, null, 2);
 
-  total++;
-
-  document.getElementById("counter").innerText = total;
-
-  log({
-    profile,
-    ...data
-  });
-
-  updateStats(data);
-  updateChart();
+document.getElementById("countryBox").innerText =
+JSON.stringify(countryMap, null, 2);
 }
 
-async function sendStatus(code) {
-  const res = await fetch(`${API}?status=${code}&t=${Date.now()}`);
-  const data = await res.json();
+/* BUTTONS */
 
-  total++;
+function sendTraffic(){ callWorker(200); }
+function spamTraffic(){ for(let i=0;i<10;i++) callWorker(200); }
+function botTraffic(){ for(let i=0;i<10;i++) callWorker(403); }
 
-  document.getElementById("counter").innerText = total;
-
-  log({
-    profile: "manual",
-    ...data
-  });
-
-  updateStats(data);
-  updateChart();
-}
-
-function log(d) {
-  const box = document.getElementById("log");
-
-  box.innerHTML = `
-[${new Date().toLocaleTimeString()}]
-STATUS: ${d.edgeStatus}
-COUNTRY: ${d.country}
-BOT SCORE: ${d.botScore}
-CACHE: ${d.cache}
-PROFILE: ${d.profile}
--------------------
-` + box.innerHTML;
-}
-
-/* TRAFFIC MODES */
-function normalTraffic(){ sendRequest("normal"); }
-function trafficSpike(){ for(let i=0;i<25;i++) sendRequest("spike"); }
-function botSimulation(){ for(let i=0;i<20;i++) sendRequest("bot"); }
-
-function wafTest(){ sendStatus(403); }
-function rateLimit(){ sendStatus(429); }
-function errorTest(){ sendStatus(404); }
-
-setInterval(()=> sendRequest("auto"), 3000);
+function sendStatus(code){ callWorker(code); }
