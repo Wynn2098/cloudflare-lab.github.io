@@ -24,26 +24,16 @@ h1 {
   text-align: center;
 }
 
-p {
-  text-align: center;
-  opacity: 0.8;
-}
-
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
-  margin-top: 20px;
 }
 
 .card {
   background: #111b2e;
   padding: 20px;
   border-radius: 12px;
-}
-
-.card h2 {
-  margin-top: 0;
 }
 
 button {
@@ -56,36 +46,24 @@ button {
   background: #38bdf8;
   color: black;
   font-weight: bold;
-  transition: 0.2s;
 }
 
 button:hover {
   background: #0ea5e9;
-  transform: scale(1.02);
-}
-
-#counter {
-  font-size: 48px;
-  text-align: center;
-  margin: 10px 0;
 }
 
 #log {
   background: black;
-  padding: 12px;
+  padding: 10px;
   min-height: 80px;
   font-size: 14px;
-  border-radius: 6px;
   overflow-wrap: break-word;
 }
 
-.small-note {
-  font-size: 12px;
-  opacity: 0.7;
-  text-align: center;
+#counter {
+  font-size: 40px;
 }
 </style>
-
 </head>
 
 <body>
@@ -94,8 +72,8 @@ button:hover {
 
 <h1>☁️ Cloudflare Traffic Intelligence Lab</h1>
 
-<p>
-Simulated traffic generator + Cloudflare analytics learning dashboard
+<p style="text-align:center;">
+Simulated traffic + Cloudflare analytics learning dashboard
 </p>
 
 <div class="grid">
@@ -112,7 +90,7 @@ Simulated traffic generator + Cloudflare analytics learning dashboard
 
 <!-- EDGE TESTS -->
 <div class="card">
-<h2>Edge / Security Tests</h2>
+<h2>Edge Tests</h2>
 <button onclick="normalTraffic()">Normal Traffic</button>
 <button onclick="trafficSpike()">Traffic Spike</button>
 <button onclick="errorTest()">404 Test</button>
@@ -121,17 +99,13 @@ Simulated traffic generator + Cloudflare analytics learning dashboard
 <button onclick="rateLimit()">Rate Limit Test</button>
 </div>
 
-<!-- LIVE STATS -->
+<!-- STATS -->
 <div class="card">
 <h2>Live Counter</h2>
 <div id="counter">0</div>
 
-<h2>Activity Log</h2>
-<div id="log">Waiting for requests...</div>
-
-<p class="small-note">
-Logs are simulated locally. Cloudflare logs appear in dashboard.
-</p>
+<h3>Activity Log</h3>
+<div id="log">Waiting...</div>
 </div>
 
 </div>
@@ -141,24 +115,6 @@ Logs are simulated locally. Cloudflare logs appear in dashboard.
 <script>
 let count = 0;
 
-/* -----------------------------
-   SIMPLE LOG FUNCTION
------------------------------ */
-function log(msg) {
-  document.getElementById("log").innerText = msg;
-}
-
-/* -----------------------------
-   COUNTER
------------------------------ */
-function inc() {
-  count++;
-  document.getElementById("counter").innerText = count;
-}
-
-/* -----------------------------
-   USER AGENT PROFILES (SIMULATION)
------------------------------ */
 const agents = {
   chrome_win: "Chrome / Windows UA",
   chrome_mac: "Chrome / macOS UA",
@@ -166,6 +122,15 @@ const agents = {
   android: "Android UA",
   bot: "Cloudflare-Lab-Bot"
 };
+
+function log(msg) {
+  document.getElementById("log").innerText = msg;
+}
+
+function inc() {
+  count++;
+  document.getElementById("counter").innerText = count;
+}
 
 /* -----------------------------
    PROFILE REQUESTS
@@ -203,7 +168,7 @@ function trafficSpike() {
 }
 
 /* -----------------------------
-   404 TEST
+   ERROR TEST
 ----------------------------- */
 function errorTest() {
   fetch("/this-page-does-not-exist");
@@ -226,7 +191,7 @@ function cacheTest() {
 function wafTest() {
   fetch("/admin-panel");
   inc();
-  log("WAF test sent (/admin-panel)");
+  log("WAF test sent");
 }
 
 /* -----------------------------
@@ -237,7 +202,7 @@ function rateLimit() {
     fetch("/rate-test");
     inc();
   }
-  log("Rate limit test sent (20 requests)");
+  log("Rate limit test sent");
 }
 </script>
 
