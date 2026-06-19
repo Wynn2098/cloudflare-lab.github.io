@@ -68,6 +68,10 @@ const systemStatus = document.getElementById("systemStatus");
    CHARTS
 ========================================================= */
 
+/* =========================================================
+   CHARTS (Restored to Cloudflare Orange Theme)
+========================================================= */
+
 const trafficChart = new Chart(
   document.getElementById("trafficChart"),
   {
@@ -77,8 +81,11 @@ const trafficChart = new Chart(
       datasets: [{
         label: "Requests",
         data: [],
+        borderColor: "#f48120",          // <-- True Cloudflare Orange for the line
+        backgroundColor: "rgba(244, 129, 32, 0.15)", // <-- Faded orange for the wave glow
         borderWidth: 3,
-        tension: 0.3
+        tension: 0.3,                     // <-- Keeps the line smooth and wavy
+        fill: true                        // <-- Enables the glow under the wave
       }]
     },
     options: {
