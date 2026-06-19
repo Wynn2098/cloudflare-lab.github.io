@@ -320,18 +320,25 @@ async function simulateAttack(type) {
   }
 }
 
+/* =========================================================
+   EDGE STATUS SIMULATOR (Fixed to bypass Local Disk Cache)
+========================================================= */
+
 async function simulateStatus(code) {
   const amount = getTrafficAmount();
   addLog(`Simulating ${amount} requests returning status ${code}...`, "info");
 
   for (let i = 0; i < amount; i++) {
-    fetch(`${API_URL}status/${code}`)
+    // Cache Buster: Appends a completely unique number to every single loop iteration
+    const uniqueBuster = `cb=${Date.now()}_${Math.floor(Math.random() * 1000000)}`;
+    const targetURL = `${API_URL}status/${code}?${uniqueBuster}`;
+
+    fetch(targetURL)
       .then(response => {
-        // Construct a safe object payload to pass to our graphs
         const payload = {
           count: 1,
           requestsPerSecond: 1,
-          threatEvents: (code >= 400) ? 1 : 0 // Treat error status codes as security chart spikes
+          threatEvents: (code >= 400) ? 1 : 0 
         };
         applyResponse(payload);
       })
