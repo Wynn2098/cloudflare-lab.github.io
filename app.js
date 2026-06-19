@@ -122,8 +122,28 @@ const securityChart = new Chart(
    HELPERS
 ========================================================= */
 
+/* =========================================================
+   HELPERS (Fixed Input Field Range Check)
+========================================================= */
+
 function getTrafficAmount() {
-  return parseInt(trafficAmountInput.value) || 100;
+  const inputEl = document.getElementById("trafficAmount");
+  
+  // If the input element is missing on the HTML, default to 50
+  if (!inputEl) return 1;
+
+  let value = parseInt(inputEl.value);
+
+  // If the box is empty or not a valid number, default to 50
+  if (isNaN(value)) {
+    return 1;
+  }
+
+  // Enforce a safe range between 1 and 100 so your browser doesn't freeze
+  if (value < 1) return 1;
+  if (value > 100) return 100;
+
+  return value;
 }
 
 function timeLabel() {
