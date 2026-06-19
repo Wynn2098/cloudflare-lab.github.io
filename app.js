@@ -287,9 +287,16 @@ function applyResponse(data) {
 
 async function generateTraffic(type) {
   const count = getTrafficAmount();
-  const result = await callAPI({ action: "traffic", profile: type, count });
+  
+  // Firing a real POST command to your API Worker 
+  const result = await callAPI({
+    action: "traffic",
+    profile: type, // This tells the worker whether to simulate Chrome, iOS, or Googlebot
+    count: count
+  });
+
   applyResponse(result);
-  addLog(`${type.toUpperCase()} traffic generated (${count} requests)`);
+  addLog(`${type.toUpperCase()} profile traffic generated (${count} requests)`);
 }
 
 /* =========================================================
