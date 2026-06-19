@@ -197,12 +197,18 @@ function updateMetrics() {
 }
 
 /* =========================================================
-   WORKER API CALL
+   WORKER API CALL (With Force-Logging Cache Buster)
 ========================================================= */
 
 async function callAPI(payload) {
   try {
-    const response = await fetch(API_URL, {
+    // Generates a totally unique string for every single network packet
+    const cacheBuster = `cb=${Date.now()}_${Math.floor(Math.random() * 1000000)}`;
+    
+    // Attaches the unique string to the URL (e.g., https://...workers.dev/?cb=1718821920_48291)
+    const uniqueURL = API_URL.includes('?') ? `${API_URL}&${cacheBuster}` : `${API_URL}?${cacheBuster}`;
+
+    const response = await fetch(uniqueURL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -216,9 +222,6 @@ async function callAPI(payload) {
   }
 }
 
-/* =========================================================
-   PROCESS RESPONSES
-========================================================= */
 
 /* =========================================================
    PROCESS INCOMING DATA PACKETS (With Current Time Grouping)
