@@ -384,18 +384,27 @@ document.getElementById("verifiedBotBtn").addEventListener("click", () => securi
    SYNCHRONIZED BACKGROUND TICKER (Maintains Clear Gaps)
 ========================================================= */
 
+/* =========================================================
+   SYNCHRONIZED BACKGROUND TICKER (Real-World Fluctuation 1-1000)
+========================================================= */
+
 setInterval(() => {
-  const pulse = 1; 
+  // 1. Generate a fluctuating traffic value between 1 and 1000 requests
+  const pulse = Math.floor(Math.random() * 1000) + 1; 
   
+  // 2. Accumulate the values into your display counters
   state.totalRequests += pulse;
-  state.visitors += 1;
+  
+  // Unique visitors climb naturally as a realistic fraction (roughly 20%) of the pulse
+  state.visitors += Math.floor(pulse * 0.2) + 1;
+  
   state.rps = pulse;
   
   updateMetrics();
   
   const currentTickTime = timeLabel();
 
-  // Only push a new background tick if the timestamp doesn't exist yet
+  // 3. Roll the Traffic Chart forward with the fluctuating 1-1000 value
   if (!trafficChart.data.labels.includes(currentTickTime)) {
     trafficChart.data.labels.push(currentTickTime);
     trafficChart.data.datasets[0].data.push(pulse);
@@ -405,8 +414,9 @@ setInterval(() => {
     }
     trafficChart.update();
 
+    // 4. Roll the Security Chart forward cleanly
     securityChart.data.labels.push(currentTickTime);
-    securityChart.data.datasets[0].data.push(0); // Baseline stays clean at 0
+    securityChart.data.datasets[0].data.push(0); // Security base remains quiet at 0
     if (securityChart.data.labels.length > 15) {
       securityChart.data.labels.shift();
       securityChart.data.datasets[0].data.shift();
@@ -414,7 +424,7 @@ setInterval(() => {
     securityChart.update();
   }
 
-}, 3000); // Maintained at a clear 3-second pacing gap
+}, 3000); // Runs every 3 seconds
 
 /* =========================================================
    INITIALIZATION
