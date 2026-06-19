@@ -1,6 +1,6 @@
 /* =========================================================
    Cloudflare Security Lab
-   app.js
+   app.js (Fully Unified & Synchronized Edition)
 ========================================================= */
 
 const API_URL = "https://cloudflarelab-api.wincapz20.workers.dev/";
@@ -65,11 +65,7 @@ const trafficAmountInput = document.getElementById("trafficAmount");
 const systemStatus = document.getElementById("systemStatus");
 
 /* =========================================================
-   CHARTS
-========================================================= */
-
-/* =========================================================
-   CHARTS (Restored to Cloudflare Orange Theme)
+   CHARTS INITIALIZATION
 ========================================================= */
 
 const trafficChart = new Chart(
@@ -81,11 +77,11 @@ const trafficChart = new Chart(
       datasets: [{
         label: "Requests",
         data: [],
-        borderColor: "#f48120",          // <-- True Cloudflare Orange for the line
-        backgroundColor: "rgba(244, 129, 32, 0.15)", // <-- Faded orange for the wave glow
+        borderColor: "#f48120",
+        backgroundColor: "rgba(244, 129, 32, 0.15)",
         borderWidth: 3,
-        tension: 0.3,                     // <-- Keeps the line smooth and wavy
-        fill: true                        // <-- Enables the glow under the wave
+        tension: 0.3,
+        fill: true
       }]
     },
     options: {
@@ -112,9 +108,9 @@ const securityChart = new Chart(
       maintainAspectRatio: false,
       scales: {
         y: {
-          beginAtZero: true,   // <-- CRITICAL: Forces bars to sit on a flat baseline
+          beginAtZero: true,
           ticks: {
-            stepSize: 1        // <-- Keeps integers clean instead of decimals like 0.1, 0.2
+            stepSize: 1
           }
         }
       }
@@ -142,7 +138,7 @@ function randomCountry() {
 function addLog(message, type = "success") {
   const div = document.createElement("div");
   div.className = `log-entry log-${type}`;
-  div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+  div.innerHTML = `[${timeLabel()}] ${message}`;
   activityLogEl.prepend(div);
 
   while (activityLogEl.children.length > 100) {
@@ -180,28 +176,6 @@ function updateMetrics() {
   countryBR.textContent = state.countries.BR;
 }
 
-function updateTrafficChart(value) {
-  trafficChart.data.labels.push(timeLabel());
-  trafficChart.data.datasets[0].data.push(value);
-
-  if (trafficChart.data.labels.length > 25) {
-    trafficChart.data.labels.shift();
-    trafficChart.data.datasets[0].data.shift();
-  }
-  trafficChart.update();
-}
-
-function updateSecurityChart(value) {
-  securityChart.data.labels.push(timeLabel());
-  securityChart.data.datasets[0].data.push(value);
-
-  if (securityChart.data.labels.length > 25) {
-    securityChart.data.labels.shift();
-    securityChart.data.datasets[0].data.shift();
-  }
-  securityChart.update();
-}
-
 /* =========================================================
    WORKER API CALL
 ========================================================= */
@@ -215,18 +189,15 @@ async function callAPI(payload) {
       },
       body: JSON.stringify(payload)
     });
-
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
-    addLog(`Worker Error: ${error.message}`, "danger");
-    systemStatus.textContent = "Worker Offline";
+    console.error("API Error:", error);
     return null;
   }
 }
 
 /* =========================================================
-   PROCESS RESPONSE (Your New Fixed Function Added Here)
+   PROCESS RESPONSES
 ========================================================= */
 
 function applyResponse(data) {
@@ -246,184 +217,161 @@ function applyResponse(data) {
   state.cacheMisses += data.cacheMisses || 0;
   state.rps = data.requestsPerSecond || data.count || 0;
 
-  // Dynamically calculate cache hit ratio locally
   const totalCache = state.cacheHits + state.cacheMisses;
   if (totalCache > 0) {
     state.cacheHitRatio = Math.round((state.cacheHits / totalCache) * 100);
   }
 
-  // Populate country analytics
   const countryCode = data.country || randomCountry();
   if (state.countries[countryCode] !== undefined) {
     state.countries[countryCode] += data.count || 1;
   }
 
   updateMetrics();
-  updateTrafficChart(data.count || 0);
 
-  if (data.threatEvents > 0) {
-    updateSecurityChart(data.threatEvents);
-  } else {
-    // Keep the chart moving even when there are no threats
-    updateSecurityChart(0);
+  // Add data point directly to traffic chart
+  trafficChart.data.labels.push(timeLabel());
+  trafficChart.data.datasets[0].data.push(data.count || 0);
+  if (trafficChart.data.labels.length > 15) {
+    trafficChart.data.labels.shift();
+    trafficChart.data.datasets[0].data.shift();
   }
+  trafficChart.update();
+
+  // Add data point directly to security chart
+  securityChart.data.labels.push(timeLabel());
+  securityChart.data.datasets[0].data.push(data.threatEvents || 0);
+  if (securityChart.data.labels.length > 15) {
+    securityChart.data.labels.shift();
+    securityChart.data.datasets[0].data.shift();
+  }
+  securityChart.update();
 }
 
 /* =========================================================
-   TRAFFIC EVENTS
-========================================================= */
-
-/* =========================================================
-   UPDATED TRAFFIC LOOPS (Sends 100 Real Requests)
+   TRAFFIC GENERATION ACTIONS
 ========================================================= */
 
 async function generateTraffic(type) {
-  addLog(`Initiating real network spike: Sending 100 ${type.toUpperCase()} requests...`, "info");
+  const amount = getTrafficAmount();
+  addLog(`Generating ${amount} requests using profile: ${type.toUpperCase()}`, "info");
 
-  // This loop physically fires 100 individual requests across the internet
-  for (let i = 0; i < 100; i++) {
-    // We send a count of 1 per request so your UI and real Cloudflare align perfectly
-    callAPI({
-      action: "traffic",
-      profile: type,
-      count: 1 
-    }).then(result => {
+  for (let i = 0; i < amount; i++) {
+    callAPI({ action: "traffic", profile: type, count: 1 }).then(result => {
       if (result) applyResponse(result);
     });
-    
-    // Tiny 10-millisecond pause between requests so your browser doesn't freeze
-    await new Promise(resolve => setTimeout(resolve, 10));
+    await new Promise(resolve => setTimeout(resolve, 15));
   }
-  
-  addLog(`Finished sending 100 real ${type.toUpperCase()} requests to the Edge.`);
 }
 
 async function simulateAttack(type) {
-  addLog(`🔥 Initiating real attack spike: Sending 100 ${type.toUpperCase()} exploits...`, "danger");
+  const amount = getTrafficAmount();
+  addLog(`🔥 Triggering real WAF attack load: ${amount} ${type.toUpperCase()} exploits...`, "danger");
 
-  for (let i = 0; i < 100; i++) {
-    callAPI({
-      action: "attack",
-      attackType: type,
-      count: 1
-    }).then(result => {
+  for (let i = 0; i < amount; i++) {
+    callAPI({ action: "attack", attackType: type, count: 1 }).then(result => {
       if (result) applyResponse(result);
     });
-    
-    await new Promise(resolve => setTimeout(resolve, 10));
+    await new Promise(resolve => setTimeout(resolve, 15));
   }
-  
-  addLog(`Finished sending 100 real ${type.toUpperCase()} attacks to the Edge.`, "warning");
 }
-
-async function simulateAttack(type) {
-  const count = getTrafficAmount();
-  const result = await callAPI({
-    action: "attack",
-    attackType: type,
-    count: count
-  });
-  applyResponse(result);
-  addLog(`${type.toUpperCase()} attack simulated`, "warning");
-}
-
-/* =========================================================
-   UPDATED STATUS CODE SIMULATOR (Loops based on input amount)
-========================================================= */
 
 async function simulateStatus(code) {
-  // 1. Get the current number typed in your "Traffic Amount" box
   const amount = getTrafficAmount();
-  
-  addLog(`Sending ${amount} real requests for HTTP Status ${code}...`, "info");
+  addLog(`Simulating ${amount} requests returning status ${code}...`, "info");
 
-  // 2. Loop and physically fire that exact amount of requests
   for (let i = 0; i < amount; i++) {
     fetch(`${API_URL}status/${code}`)
       .then(response => {
-        // Track the data inside your dashboard metrics state
-        applyResponse({ count: 1, requestsPerSecond: 1 });
+        // Construct a safe object payload to pass to our graphs
+        const payload = {
+          count: 1,
+          requestsPerSecond: 1,
+          threatEvents: (code >= 400) ? 1 : 0 // Treat error status codes as security chart spikes
+        };
+        applyResponse(payload);
       })
-      .catch(err => {
-        console.error("Status request failed:", err);
-      });
-
-    // 10-millisecond delay so your browser handles the network traffic smoothly
-    await new Promise(resolve => setTimeout(resolve, 10));
+      .catch(err => console.error(err));
+      
+    await new Promise(resolve => setTimeout(resolve, 15));
   }
-
-  addLog(`Successfully sent ${amount} real ${code} status codes to the Edge.`, "success");
+  addLog(`Completed generating status ${code} events.`, "success");
 }
 
 async function securityTest(type) {
-  const result = await callAPI({
-    action: "security",
-    test: type
-  });
+  const result = await callAPI({ action: "security", test: type });
   applyResponse(result);
-  addLog(`${type} executed`);
+  addLog(`Executed platform security execution check: ${type.toUpperCase()}`);
 }
 
 /* =========================================================
-   BUTTON EVENTS LISTENERS
+   EVENT LISTENERS
 ========================================================= */
 
 document.getElementById("normalTrafficBtn").addEventListener("click", () => generateTraffic("normal"));
 document.getElementById("trafficSpikeBtn").addEventListener("click", () => generateTraffic("spike"));
 document.getElementById("botTrafficBtn").addEventListener("click", () => generateTraffic("bot"));
 
-/* Profiles */
 document.querySelectorAll("[data-profile]").forEach(btn => {
   btn.addEventListener("click", () => generateTraffic(btn.dataset.profile));
 });
 
-/* Attacks */
 document.querySelectorAll("[data-attack]").forEach(btn => {
   btn.addEventListener("click", () => simulateAttack(btn.dataset.attack));
 });
 
-/* Status Codes */
 document.querySelectorAll("[data-status]").forEach(btn => {
   btn.addEventListener("click", () => simulateStatus(btn.dataset.status));
 });
 
-/* Security Testing Buttons */
 document.getElementById("wafTestBtn").addEventListener("click", () => securityTest("waf"));
 document.getElementById("rateLimitBtn").addEventListener("click", () => securityTest("rate_limit"));
 document.getElementById("loginAttackBtn").addEventListener("click", () => securityTest("login"));
 document.getElementById("cacheTestBtn").addEventListener("click", () => securityTest("cache"));
 document.getElementById("errorTestBtn").addEventListener("click", () => securityTest("404"));
 
-/* Bot Management Buttons */
 document.getElementById("allowBotsBtn").addEventListener("click", () => securityTest("allow_bots"));
 document.getElementById("challengeBotsBtn").addEventListener("click", () => securityTest("challenge_bots"));
 document.getElementById("blockBotsBtn").addEventListener("click", () => securityTest("block_bots"));
 document.getElementById("verifiedBotBtn").addEventListener("click", () => securityTest("verified_bot"));
 
 /* =========================================================
-   LIVE BACKGROUND TRAFFIC SIMULATOR (Fixed for Wavy Lines)
+   SYNCHRONIZED BACKGROUND TICKER (Maintains Smooth Scroll)
 ========================================================= */
 
 setInterval(() => {
-  // 1. Generate a naturally fluctuating mock background traffic value
-  // This picks a random number between 15 and 45 requests per interval
-  const backgroundRequestCount = Math.floor(Math.random() * 30) + 15;
+  const pulse = Math.floor(Math.random() * 21) + 15; // Natural background ripple (15-35)
   
-  // 2. Mock calculating the requests per second metric dynamically
-  state.rps = backgroundRequestCount;
+  state.totalRequests += pulse;
+  state.visitors += Math.floor(pulse * 0.4);
+  state.rps = pulse;
   
-  // 3. Update text metrics on the screen
   updateMetrics();
   
-  // 4. CRITICAL: Pass the fluctuating value directly to the traffic chart
-  // This gives the chart different high/low points to build the wave format!
-  updateTrafficChart(backgroundRequestCount);
+  const currentTickTime = timeLabel();
 
-}, 3000); // Runs every 3 seconds so the timestamps have clear, readable gaps
+  // 1. Roll the Traffic Chart forward
+  trafficChart.data.labels.push(currentTickTime);
+  trafficChart.data.datasets[0].data.push(pulse);
+  if (trafficChart.data.labels.length > 15) {
+    trafficChart.data.labels.shift();
+    trafficChart.data.datasets[0].data.shift();
+  }
+  trafficChart.update();
+
+  // 2. Roll the Security Chart forward with clean 0 baselines
+  securityChart.data.labels.push(currentTickTime);
+  securityChart.data.datasets[0].data.push(0);
+  if (securityChart.data.labels.length > 15) {
+    securityChart.data.labels.shift();
+    securityChart.data.datasets[0].data.shift();
+  }
+  securityChart.update();
+
+}, 3000);
 
 /* =========================================================
-   INIT
+   INITIALIZATION
 ========================================================= */
-
 addLog("Cloudflare Security Lab initialized");
 updateMetrics();
