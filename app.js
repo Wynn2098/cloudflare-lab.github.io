@@ -381,19 +381,21 @@ document.getElementById("verifiedBotBtn").addEventListener("click", () => securi
 
 
 /* =========================================================
-   AUTOMATED BACKGROUND TRAFFIC BLASTER (Sends Real Traffic)
+   HYBRID BACKGROUND BLASTER (Real Traffic + 1-100 Visual Scale)
 ========================================================= */
 
 setInterval(async () => {
-  // 1. Pick a random batch size of REAL requests to send (e.g., between 5 and 15)
-  // Keep this under 20 so your browser doesn't trigger security blocks or lag
-  const batchSize = Math.floor(Math.random() * 11) + 5; 
-  
-  addLog(`Automated background sync: Blasting ${batchSize} physical requests to the Edge...`, "info");
+  // 1. Generate a beautiful, fluctuating baseline value strictly between 1 and 100
+  const simulatedPulse = Math.floor(Math.random() * 100) + 1; 
 
-  // 2. Loop and physically fire multiple concurrent connections across the internet
-  for (let i = 0; i < batchSize; i++) {
-    // Randomly mix normal traffic profiles so your real Cloudflare dashboard logs varied data
+  // 2. Determine a safe number of actual physical packets to send based on that pulse
+  // We use Math.min to ensure your browser never tries to fire more than 10 physical requests at once
+  const actualPackets = Math.min(Math.ceil(simulatedPulse * 0.1), 10);
+  
+  addLog(`Automated background sync: Synchronizing analytics with Cloudflare Edge...`, "info");
+
+  // 3. Fire the actual network packets so your real Cloudflare dashboard increments
+  for (let i = 0; i < actualPackets; i++) {
     const profiles = ["normal", "spike", "bot"];
     const randomProfile = profiles[Math.floor(Math.random() * profiles.length)];
 
@@ -401,20 +403,42 @@ setInterval(async () => {
       action: "traffic", 
       profile: randomProfile, 
       count: 1 
-    }).then(result => {
-      if (result) {
-        // This function handles updating the screen state, text cards, 
-        // and pushes the real data into your Chart.js line and bar graphs!
-        applyResponse(result);
-      }
-    });
-
-    // Stagger them by 20 milliseconds so they fire practically simultaneously 
-    // without overloading your browser's network queue
-    await new Promise(resolve => setTimeout(resolve, 20));
+    }); // Fires background packets directly into Cloudflare's servers
+    
+    await new Promise(resolve => setTimeout(resolve, 25));
   }
 
-}, 5000); // Fires a brand new batch of physical requests every 5 seconds automatically
+  // 4. Update your frontend metrics and charts using the 1-100 scaled value
+  state.totalRequests += simulatedPulse;
+  state.visitors += Math.floor(simulatedPulse * 0.15) + 1; // Visitors scale naturally
+  state.rps = simulatedPulse;
+  
+  updateMetrics();
+  
+  const currentTickTime = timeLabel();
+
+  // 5. Update the Live Traffic Line Chart with the 1-100 number
+  if (!trafficChart.data.labels.includes(currentTickTime)) {
+    trafficChart.data.labels.push(currentTickTime);
+    trafficChart.data.datasets[0].data.push(simulatedPulse); // Injects the clean 1-100 values
+
+    if (trafficChart.data.labels.length > 15) {
+      trafficChart.data.labels.shift();
+      trafficChart.data.datasets[0].data.shift();
+    }
+    trafficChart.update();
+
+    // Keep Security Bar Chart steady at 0 baseline
+    securityChart.data.labels.push(currentTickTime);
+    securityChart.data.datasets[0].data.push(0); 
+    if (securityChart.data.labels.length > 15) {
+      securityChart.data.labels.shift();
+      securityChart.data.datasets[0].data.shift();
+    }
+    securityChart.update();
+  }
+
+}, 4000); // Runs a fresh wave every 4 seconds
 
 /* =========================================================
    INITIALIZATION
