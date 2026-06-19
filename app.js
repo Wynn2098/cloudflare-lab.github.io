@@ -393,13 +393,25 @@ document.getElementById("blockBotsBtn").addEventListener("click", () => security
 document.getElementById("verifiedBotBtn").addEventListener("click", () => securityTest("verified_bot"));
 
 /* =========================================================
-   LIVE BACKGROUND TRAFFIC SIMULATOR
+   LIVE BACKGROUND TRAFFIC SIMULATOR (Fixed for Wavy Lines)
 ========================================================= */
 
 setInterval(() => {
-  state.rps = Math.floor(Math.random() * 4000);
+  // 1. Generate a naturally fluctuating mock background traffic value
+  // This picks a random number between 15 and 45 requests per interval
+  const backgroundRequestCount = Math.floor(Math.random() * 30) + 15;
+  
+  // 2. Mock calculating the requests per second metric dynamically
+  state.rps = backgroundRequestCount;
+  
+  // 3. Update text metrics on the screen
   updateMetrics();
-}, 2000);
+  
+  // 4. CRITICAL: Pass the fluctuating value directly to the traffic chart
+  // This gives the chart different high/low points to build the wave format!
+  updateTrafficChart(backgroundRequestCount);
+
+}, 3000); // Runs every 3 seconds so the timestamps have clear, readable gaps
 
 /* =========================================================
    INIT
