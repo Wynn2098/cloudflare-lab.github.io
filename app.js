@@ -109,7 +109,15 @@ const securityChart = new Chart(
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,   // <-- CRITICAL: Forces bars to sit on a flat baseline
+          ticks: {
+            stepSize: 1        // <-- Keeps integers clean instead of decimals like 0.1, 0.2
+          }
+        }
+      }
     }
   }
 );
