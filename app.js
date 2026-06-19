@@ -312,15 +312,32 @@ async function simulateAttack(type) {
   addLog(`${type.toUpperCase()} attack simulated`, "warning");
 }
 
+/* =========================================================
+   UPDATED STATUS CODE SIMULATOR (Loops based on input amount)
+========================================================= */
+
 async function simulateStatus(code) {
-  try {
-    // Point directly to your live API worker status path
-    const response = await fetch(`${API_URL}status/${code}`);
-    applyResponse({ count: 1, requestsPerSecond: 1 });
-    addLog(`Requested status ${code}. Cloudflare Edge replied with: ${response.status}`);
-  } catch (e) {
-    addLog(`Network or configuration error on status ${code}`, "danger");
+  // 1. Get the current number typed in your "Traffic Amount" box
+  const amount = getTrafficAmount();
+  
+  addLog(`Sending ${amount} real requests for HTTP Status ${code}...`, "info");
+
+  // 2. Loop and physically fire that exact amount of requests
+  for (let i = 0; i < amount; i++) {
+    fetch(`${API_URL}status/${code}`)
+      .then(response => {
+        // Track the data inside your dashboard metrics state
+        applyResponse({ count: 1, requestsPerSecond: 1 });
+      })
+      .catch(err => {
+        console.error("Status request failed:", err);
+      });
+
+    // 10-millisecond delay so your browser handles the network traffic smoothly
+    await new Promise(resolve => setTimeout(resolve, 10));
   }
+
+  addLog(`Successfully sent ${amount} real ${code} status codes to the Edge.`, "success");
 }
 
 async function securityTest(type) {
