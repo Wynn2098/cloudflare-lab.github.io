@@ -376,55 +376,42 @@ document.getElementById("challengeBotsBtn").addEventListener("click", () => secu
 document.getElementById("blockBotsBtn").addEventListener("click", () => securityTest("block_bots"));
 document.getElementById("verifiedBotBtn").addEventListener("click", () => securityTest("verified_bot"));
 
-/* =========================================================
-   SYNCHRONIZED BACKGROUND TICKER (Maintains Smooth Scroll)
-========================================================= */
 
 /* =========================================================
-   SYNCHRONIZED BACKGROUND TICKER (Maintains Clear Gaps)
+   AUTOMATED BACKGROUND TRAFFIC BLASTER (Sends Real Traffic)
 ========================================================= */
 
-/* =========================================================
-   SYNCHRONIZED BACKGROUND TICKER (Real-World Fluctuation 1-1000)
-========================================================= */
+setInterval(async () => {
+  // 1. Pick a random batch size of REAL requests to send (e.g., between 5 and 15)
+  // Keep this under 20 so your browser doesn't trigger security blocks or lag
+  const batchSize = Math.floor(Math.random() * 11) + 5; 
+  
+  addLog(`Automated background sync: Blasting ${batchSize} physical requests to the Edge...`, "info");
 
-setInterval(() => {
-  // 1. Generate a fluctuating traffic value between 1 and 1000 requests
-  const pulse = Math.floor(Math.random() * 1000) + 1; 
-  
-  // 2. Accumulate the values into your display counters
-  state.totalRequests += pulse;
-  
-  // Unique visitors climb naturally as a realistic fraction (roughly 20%) of the pulse
-  state.visitors += Math.floor(pulse * 0.2) + 1;
-  
-  state.rps = pulse;
-  
-  updateMetrics();
-  
-  const currentTickTime = timeLabel();
+  // 2. Loop and physically fire multiple concurrent connections across the internet
+  for (let i = 0; i < batchSize; i++) {
+    // Randomly mix normal traffic profiles so your real Cloudflare dashboard logs varied data
+    const profiles = ["normal", "spike", "bot"];
+    const randomProfile = profiles[Math.floor(Math.random() * profiles.length)];
 
-  // 3. Roll the Traffic Chart forward with the fluctuating 1-1000 value
-  if (!trafficChart.data.labels.includes(currentTickTime)) {
-    trafficChart.data.labels.push(currentTickTime);
-    trafficChart.data.datasets[0].data.push(pulse);
-    if (trafficChart.data.labels.length > 15) {
-      trafficChart.data.labels.shift();
-      trafficChart.data.datasets[0].data.shift();
-    }
-    trafficChart.update();
+    callAPI({ 
+      action: "traffic", 
+      profile: randomProfile, 
+      count: 1 
+    }).then(result => {
+      if (result) {
+        // This function handles updating the screen state, text cards, 
+        // and pushes the real data into your Chart.js line and bar graphs!
+        applyResponse(result);
+      }
+    });
 
-    // 4. Roll the Security Chart forward cleanly
-    securityChart.data.labels.push(currentTickTime);
-    securityChart.data.datasets[0].data.push(0); // Security base remains quiet at 0
-    if (securityChart.data.labels.length > 15) {
-      securityChart.data.labels.shift();
-      securityChart.data.datasets[0].data.shift();
-    }
-    securityChart.update();
+    // Stagger them by 20 milliseconds so they fire practically simultaneously 
+    // without overloading your browser's network queue
+    await new Promise(resolve => setTimeout(resolve, 20));
   }
 
-}, 3000); // Runs every 3 seconds
+}, 5000); // Fires a brand new batch of physical requests every 5 seconds automatically
 
 /* =========================================================
    INITIALIZATION
