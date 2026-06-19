@@ -220,6 +220,10 @@ async function callAPI(payload) {
    PROCESS RESPONSES
 ========================================================= */
 
+/* =========================================================
+   PROCESS INCOMING DATA PACKETS (With Current Time Grouping)
+========================================================= */
+
 function applyResponse(data) {
   if (!data) return;
 
@@ -249,18 +253,35 @@ function applyResponse(data) {
 
   updateMetrics();
 
-  // Add data point directly to traffic chart
-  trafficChart.data.labels.push(timeLabel());
-  trafficChart.data.datasets[0].data.push(data.count || 0);
+  /* =========================================================
+     FIXED CHART ENGINE: Uses currentTime to group bars
+     ========================================================= */
+  const currentTime = timeLabel(); // <-- This creates the timestamp variable
+
+  // 1. Group Traffic Data
+  const trafficTimeIndex = trafficChart.data.labels.indexOf(currentTime);
+  if (trafficTimeIndex !== -1) {
+    trafficChart.data.datasets[0].data[trafficTimeIndex] += data.count || 0;
+  } else {
+    trafficChart.data.labels.push(currentTime);
+    trafficChart.data.datasets[0].data.push(data.count || 0);
+  }
+
   if (trafficChart.data.labels.length > 15) {
     trafficChart.data.labels.shift();
     trafficChart.data.datasets[0].data.shift();
   }
   trafficChart.update();
 
-  // Add data point directly to security chart
-  securityChart.data.labels.push(timeLabel());
-  securityChart.data.datasets[0].data.push(data.threatEvents || 0);
+  // 2. Group Security Threat Data
+  const securityTimeIndex = securityChart.data.labels.indexOf(currentTime);
+  if (securityTimeIndex !== -1) {
+    securityChart.data.datasets[0].data[securityTimeIndex] += data.threatEvents || 0;
+  } else {
+    securityChart.data.labels.push(currentTime);
+    securityChart.data.datasets[0].data.push(data.threatEvents || 0);
+  }
+
   if (securityChart.data.labels.length > 15) {
     securityChart.data.labels.shift();
     securityChart.data.datasets[0].data.shift();
