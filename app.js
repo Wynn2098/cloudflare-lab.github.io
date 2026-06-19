@@ -308,21 +308,30 @@ async function simulateAttack(type) {
 ========================================================= */
 
 async function simulateStatus(code) {
-  const result = await callAPI({ action: "status", statusCode: parseInt(code) });
-  applyResponse(result);
-  addLog(`HTTP Status ${code} simulated`);
+  try {
+    // We point directly to the absolute URL of your API worker
+    const response = await fetch(`https://cloudflarelab-api.wincapz20.workers.dev/status/${code}`);
+    addLog(`Requested status ${code}. Cloudflare Edge replied with: ${response.status}`);
+  } catch (e) {
+    addLog(`Network or configuration error on status ${code}`, "danger");
+  }
 }
-
 /* =========================================================
    SECURITY TESTS
 ========================================================= */
 
-async function securityTest(type) {
-  const result = await callAPI({ action: "security", test: type });
-  applyResponse(result);
-  addLog(`Security test executed: ${type.replace("_", " ").toUpperCase()}`, "warning");
+async function simulateStatus(code) {
+  try {
+    // CRITICAL: Change this to target your live API worker domain directly
+    const response = await fetch(`https://cloudflarelab-api.wincapz20.workers.dev/status/${code}`);
+    
+    // This updates your custom dashboard log box with the response code
+    applyResponse({ count: 1, requestsPerSecond: 1 }); 
+    addLog(`Requested status ${code}. Cloudflare Edge replied with: ${response.status}`);
+  } catch (e) {
+    addLog(`Network or configuration error on status ${code}`, "danger");
+  }
 }
-
 /* =========================================================
    BUTTON EVENTS
 ========================================================= */
