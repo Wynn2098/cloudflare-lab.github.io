@@ -380,36 +380,41 @@ document.getElementById("verifiedBotBtn").addEventListener("click", () => securi
    SYNCHRONIZED BACKGROUND TICKER (Maintains Smooth Scroll)
 ========================================================= */
 
+/* =========================================================
+   SYNCHRONIZED BACKGROUND TICKER (Maintains Clear Gaps)
+========================================================= */
+
 setInterval(() => {
-  const pulse = Math.floor(Math.random() * 21) + 15; // Natural background ripple (15-35)
+  const pulse = 1; 
   
   state.totalRequests += pulse;
-  state.visitors += Math.floor(pulse * 0.4);
+  state.visitors += 1;
   state.rps = pulse;
   
   updateMetrics();
   
   const currentTickTime = timeLabel();
 
-  // 1. Roll the Traffic Chart forward
-  trafficChart.data.labels.push(currentTickTime);
-  trafficChart.data.datasets[0].data.push(pulse);
-  if (trafficChart.data.labels.length > 15) {
-    trafficChart.data.labels.shift();
-    trafficChart.data.datasets[0].data.shift();
-  }
-  trafficChart.update();
+  // Only push a new background tick if the timestamp doesn't exist yet
+  if (!trafficChart.data.labels.includes(currentTickTime)) {
+    trafficChart.data.labels.push(currentTickTime);
+    trafficChart.data.datasets[0].data.push(pulse);
+    if (trafficChart.data.labels.length > 15) {
+      trafficChart.data.labels.shift();
+      trafficChart.data.datasets[0].data.shift();
+    }
+    trafficChart.update();
 
-  // 2. Roll the Security Chart forward with clean 0 baselines
-  securityChart.data.labels.push(currentTickTime);
-  securityChart.data.datasets[0].data.push(0);
-  if (securityChart.data.labels.length > 15) {
-    securityChart.data.labels.shift();
-    securityChart.data.datasets[0].data.shift();
+    securityChart.data.labels.push(currentTickTime);
+    securityChart.data.datasets[0].data.push(0); // Baseline stays clean at 0
+    if (securityChart.data.labels.length > 15) {
+      securityChart.data.labels.shift();
+      securityChart.data.datasets[0].data.shift();
+    }
+    securityChart.update();
   }
-  securityChart.update();
 
-}, 3000);
+}, 3000); // Maintained at a clear 3-second pacing gap
 
 /* =========================================================
    INITIALIZATION
