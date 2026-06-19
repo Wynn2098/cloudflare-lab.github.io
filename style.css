@@ -1,3 +1,7 @@
+body {
+  zoom: 0.67; /* Scaled down to 67% */
+  background-color: #0f172a; /* Make sure your background color matches your dashboard theme */
+}
 /* ==========================================
    CLOUDFLARE SECURITY LAB
    style.css
