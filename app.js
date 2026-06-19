@@ -1,6 +1,6 @@
 /* =========================================================
    Cloudflare Security Lab
-   app.js (Fixed & Enhanced)
+   app.js
 ========================================================= */
 
 const API_URL = "https://cloudflarelab-api.wincapz20.workers.dev/";
@@ -8,7 +8,7 @@ const API_URL = "https://cloudflarelab-api.wincapz20.workers.dev/";
 const state = {
   totalRequests: 0,
   visitors: 0,
-  botScore: 100, // Default starting score
+  botScore: 100,
   cacheHitRatio: 0,
   wafEvents: 0,
   rateLimited: 0,
@@ -75,13 +75,10 @@ const trafficChart = new Chart(
     data: {
       labels: [],
       datasets: [{
-        label: "Requests per Event",
+        label: "Requests",
         data: [],
-        borderColor: "#f48120",
-        backgroundColor: "rgba(244,129,32,0.1)",
         borderWidth: 3,
-        tension: 0.3,
-        fill: true
+        tension: 0.3
       }]
     },
     options: {
@@ -130,8 +127,7 @@ function randomCountry() {
 function addLog(message, type = "success") {
   const div = document.createElement("div");
   div.className = `log-entry log-${type}`;
-  div.innerHTML = `[${timeLabel()}] ${message}`;
-  
+  div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
   activityLogEl.prepend(div);
 
   while (activityLogEl.children.length > 100) {
@@ -151,34 +147,27 @@ function updateMetrics() {
   wafEventsEl.textContent = state.wafEvents.toLocaleString();
   rateLimitedEl.textContent = state.rateLimited.toLocaleString();
   threatEventsEl.textContent = state.threatEvents.toLocaleString();
-  
   ja3CountEl.textContent = state.ja3.toLocaleString();
   ja4CountEl.textContent = state.ja4.toLocaleString();
   tlsJa3El.textContent = state.ja3.toLocaleString();
   tlsJa4El.textContent = state.ja4.toLocaleString();
-
   cacheHitsEl.textContent = state.cacheHits.toLocaleString();
   cacheMissesEl.textContent = state.cacheMisses.toLocaleString();
   cacheRatioEl.textContent = `${state.cacheHitRatio}%`;
-
   liveCounterEl.textContent = state.totalRequests.toLocaleString();
   rpsEl.textContent = state.rps.toLocaleString();
 
-  countryUS.textContent = state.countries.US.toLocaleString();
-  countryDE.textContent = state.countries.DE.toLocaleString();
-  countryJP.textContent = state.countries.JP.toLocaleString();
-  countrySG.textContent = state.countries.SG.toLocaleString();
-  countryPH.textContent = state.countries.PH.toLocaleString();
-  countryBR.textContent = state.countries.BR.toLocaleString();
+  countryUS.textContent = state.countries.US;
+  countryDE.textContent = state.countries.DE;
+  countryJP.textContent = state.countries.JP;
+  countrySG.textContent = state.countries.SG;
+  countryPH.textContent = state.countries.PH;
+  countryBR.textContent = state.countries.BR;
 }
 
-/* =========================================================
-   CHARTS UPDATE
-========================================================= */
-
-function updateTrafficChart(currentRequests) {
+function updateTrafficChart(value) {
   trafficChart.data.labels.push(timeLabel());
-  trafficChart.data.datasets[0].data.push(currentRequests); // Graph current spike, not cumulative
+  trafficChart.data.datasets[0].data.push(value);
 
   if (trafficChart.data.labels.length > 25) {
     trafficChart.data.labels.shift();
@@ -187,9 +176,9 @@ function updateTrafficChart(currentRequests) {
   trafficChart.update();
 }
 
-function updateSecurityChart(threatValue) {
+function updateSecurityChart(value) {
   securityChart.data.labels.push(timeLabel());
-  securityChart.data.datasets[0].data.push(threatValue);
+  securityChart.data.datasets[0].data.push(value);
 
   if (securityChart.data.labels.length > 25) {
     securityChart.data.labels.shift();
@@ -199,46 +188,30 @@ function updateSecurityChart(threatValue) {
 }
 
 /* =========================================================
-   WORKER API & FALLBACK SIMULATION
+   WORKER API CALL
 ========================================================= */
 
 async function callAPI(payload) {
   try {
     const response = await fetch(API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify(payload)
     });
-    
-    if (!response.ok) throw new Error("API response not OK");
-    return await response.json();
-    
-  } catch (error) {
-    // If API fails, fallback to local simulation so the dashboard still works seamlessly
-    systemStatus.textContent = "Local Simulation";
-    systemStatus.style.color = "var(--warning)";
 
-    const isAttack = payload.action === "attack";
-    const reqCount = payload.count || Math.floor(Math.random() * 50) + 10;
-    
-    return {
-      count: reqCount,
-      visitors: Math.floor(reqCount * 0.6),
-      threatEvents: isAttack ? Math.floor(Math.random() * 20) + 5 : 0,
-      wafEvents: payload.test === "waf" || isAttack ? Math.floor(Math.random() * 10) + 1 : 0,
-      rateLimited: payload.test === "rate_limit" ? reqCount : 0,
-      cacheHits: Math.floor(reqCount * 0.8),
-      cacheMisses: Math.floor(reqCount * 0.2),
-      requestsPerSecond: reqCount,
-      ja3: Math.floor(Math.random() * 5),
-      ja4: Math.floor(Math.random() * 5),
-      country: randomCountry()
-    };
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    addLog(`Worker Error: ${error.message}`, "danger");
+    systemStatus.textContent = "Worker Offline";
+    return null;
   }
 }
 
 /* =========================================================
-   PROCESS RESPONSE
+   PROCESS RESPONSE (Your New Fixed Function Added Here)
 ========================================================= */
 
 function applyResponse(data) {
@@ -282,73 +255,58 @@ function applyResponse(data) {
 }
 
 /* =========================================================
-   TRAFFIC
+   TRAFFIC EVENTS
 ========================================================= */
 
 async function generateTraffic(type) {
   const count = getTrafficAmount();
-  
-  // Firing a real POST command to your API Worker 
   const result = await callAPI({
     action: "traffic",
-    profile: type, // This tells the worker whether to simulate Chrome, iOS, or Googlebot
+    profile: type,
     count: count
   });
-
   applyResponse(result);
-  addLog(`${type.toUpperCase()} profile traffic generated (${count} requests)`);
+  addLog(`${type.toUpperCase()} traffic generated (${count})`);
 }
-
-/* =========================================================
-   ATTACKS
-========================================================= */
 
 async function simulateAttack(type) {
   const count = getTrafficAmount();
-  const result = await callAPI({ action: "attack", attackType: type, count });
+  const result = await callAPI({
+    action: "attack",
+    attackType: type,
+    count: count
+  });
   applyResponse(result);
-  addLog(`${type.toUpperCase()} attack simulated`, "danger");
+  addLog(`${type.toUpperCase()} attack simulated`, "warning");
 }
-
-/* =========================================================
-   STATUS CODES
-========================================================= */
 
 async function simulateStatus(code) {
   try {
-    // We point directly to the absolute URL of your API worker
-    const response = await fetch(`https://cloudflarelab-api.wincapz20.workers.dev/status/${code}`);
+    // Point directly to your live API worker status path
+    const response = await fetch(`${API_URL}status/${code}`);
+    applyResponse({ count: 1, requestsPerSecond: 1 });
     addLog(`Requested status ${code}. Cloudflare Edge replied with: ${response.status}`);
   } catch (e) {
     addLog(`Network or configuration error on status ${code}`, "danger");
   }
 }
-/* =========================================================
-   SECURITY TESTS
-========================================================= */
 
-async function simulateStatus(code) {
-  try {
-    // CRITICAL: Change this to target your live API worker domain directly
-    const response = await fetch(`https://cloudflarelab-api.wincapz20.workers.dev/status/${code}`);
-    
-    // This updates your custom dashboard log box with the response code
-    applyResponse({ count: 1, requestsPerSecond: 1 }); 
-    addLog(`Requested status ${code}. Cloudflare Edge replied with: ${response.status}`);
-  } catch (e) {
-    addLog(`Network or configuration error on status ${code}`, "danger");
-  }
+async function securityTest(type) {
+  const result = await callAPI({
+    action: "security",
+    test: type
+  });
+  applyResponse(result);
+  addLog(`${type} executed`);
 }
+
 /* =========================================================
-   BUTTON EVENTS
+   BUTTON EVENTS LISTENERS
 ========================================================= */
 
 document.getElementById("normalTrafficBtn").addEventListener("click", () => generateTraffic("normal"));
 document.getElementById("trafficSpikeBtn").addEventListener("click", () => generateTraffic("spike"));
-document.getElementById("botTrafficBtn").addEventListener("click", () => {
-  generateTraffic("bot");
-  state.botScore = Math.max(0, state.botScore - 15); // Naturally drop bot score
-});
+document.getElementById("botTrafficBtn").addEventListener("click", () => generateTraffic("bot"));
 
 /* Profiles */
 document.querySelectorAll("[data-profile]").forEach(btn => {
@@ -360,57 +318,32 @@ document.querySelectorAll("[data-attack]").forEach(btn => {
   btn.addEventListener("click", () => simulateAttack(btn.dataset.attack));
 });
 
-/* Status */
+/* Status Codes */
 document.querySelectorAll("[data-status]").forEach(btn => {
   btn.addEventListener("click", () => simulateStatus(btn.dataset.status));
 });
 
-/* Security Tests */
+/* Security Testing Buttons */
 document.getElementById("wafTestBtn").addEventListener("click", () => securityTest("waf"));
 document.getElementById("rateLimitBtn").addEventListener("click", () => securityTest("rate_limit"));
 document.getElementById("loginAttackBtn").addEventListener("click", () => securityTest("login"));
 document.getElementById("cacheTestBtn").addEventListener("click", () => securityTest("cache"));
 document.getElementById("errorTestBtn").addEventListener("click", () => securityTest("404"));
 
-/* Bot Management (Previously missing listeners) */
-document.getElementById("allowBotsBtn").addEventListener("click", () => {
-  securityTest("allow_bots");
-  state.botScore = 100;
-  addLog("Bot protection minimized. Bots allowed.", "warning");
-});
-document.getElementById("challengeBotsBtn").addEventListener("click", () => {
-  securityTest("challenge_bots");
-  addLog("Managed Challenge deployed against suspicious traffic.");
-});
-document.getElementById("blockBotsBtn").addEventListener("click", () => {
-  securityTest("block_bots");
-  state.threatEvents += 50;
-  addLog("Strict bot blocking enabled.", "success");
-});
-document.getElementById("verifiedBotBtn").addEventListener("click", () => {
-  securityTest("verified_bot");
-  addLog("Verified bot traffic allowed (e.g., Googlebot).");
-});
+/* Bot Management Buttons */
+document.getElementById("allowBotsBtn").addEventListener("click", () => securityTest("allow_bots"));
+document.getElementById("challengeBotsBtn").addEventListener("click", () => securityTest("challenge_bots"));
+document.getElementById("blockBotsBtn").addEventListener("click", () => securityTest("block_bots"));
+document.getElementById("verifiedBotBtn").addEventListener("click", () => securityTest("verified_bot"));
 
 /* =========================================================
-   LIVE BACKGROUND TRAFFIC (Fixed to process real data)
+   LIVE BACKGROUND TRAFFIC SIMULATOR
 ========================================================= */
 
 setInterval(() => {
-  const bgRequests = Math.floor(Math.random() * 25) + 5;
-  
-  // Create a mock payload to process background traffic properly
-  const bgData = {
-    count: bgRequests,
-    visitors: Math.floor(bgRequests * 0.4),
-    cacheHits: Math.floor(bgRequests * 0.75),
-    cacheMisses: Math.floor(bgRequests * 0.25),
-    requestsPerSecond: bgRequests,
-    country: randomCountry()
-  };
-  
-  applyResponse(bgData);
-}, 2500);
+  state.rps = Math.floor(Math.random() * 4000);
+  updateMetrics();
+}, 2000);
 
 /* =========================================================
    INIT
