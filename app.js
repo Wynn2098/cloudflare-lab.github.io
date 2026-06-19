@@ -258,15 +258,47 @@ function applyResponse(data) {
    TRAFFIC EVENTS
 ========================================================= */
 
+/* =========================================================
+   UPDATED TRAFFIC LOOPS (Sends 100 Real Requests)
+========================================================= */
+
 async function generateTraffic(type) {
-  const count = getTrafficAmount();
-  const result = await callAPI({
-    action: "traffic",
-    profile: type,
-    count: count
-  });
-  applyResponse(result);
-  addLog(`${type.toUpperCase()} traffic generated (${count})`);
+  addLog(`Initiating real network spike: Sending 100 ${type.toUpperCase()} requests...`, "info");
+
+  // This loop physically fires 100 individual requests across the internet
+  for (let i = 0; i < 100; i++) {
+    // We send a count of 1 per request so your UI and real Cloudflare align perfectly
+    callAPI({
+      action: "traffic",
+      profile: type,
+      count: 1 
+    }).then(result => {
+      if (result) applyResponse(result);
+    });
+    
+    // Tiny 10-millisecond pause between requests so your browser doesn't freeze
+    await new Promise(resolve => setTimeout(resolve, 10));
+  }
+  
+  addLog(`Finished sending 100 real ${type.toUpperCase()} requests to the Edge.`);
+}
+
+async function simulateAttack(type) {
+  addLog(`🔥 Initiating real attack spike: Sending 100 ${type.toUpperCase()} exploits...`, "danger");
+
+  for (let i = 0; i < 100; i++) {
+    callAPI({
+      action: "attack",
+      attackType: type,
+      count: 1
+    }).then(result => {
+      if (result) applyResponse(result);
+    });
+    
+    await new Promise(resolve => setTimeout(resolve, 10));
+  }
+  
+  addLog(`Finished sending 100 real ${type.toUpperCase()} attacks to the Edge.`, "warning");
 }
 
 async function simulateAttack(type) {
